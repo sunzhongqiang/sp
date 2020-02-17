@@ -1,24 +1,21 @@
 <template>
   <div class="register-page">
     <el-form
-      ref="loginForm"
-      :model="loginForm"
-      :rules="loginRules"
-      class="login-form"
+      ref="registerForm"
+      :model="user"
+      :rules="userRules"
+      class="register-form"
       auto-complete="on"
       label-position="left"
     >
       <div class="title-container">
-        <h3 class="title">注册账号</h3>
+        <h3 class="title">账号注册</h3>
       </div>
 
       <el-form-item prop="username">
-        <span class="svg-container">
-          <svg-icon icon-class="user" />
-        </span>
         <el-input
           ref="username"
-          v-model="loginForm.username"
+          v-model="user.username"
           placeholder="用户名"
           name="username"
           type="text"
@@ -28,38 +25,120 @@
       </el-form-item>
 
       <el-form-item prop="password">
-        <span class="svg-container">
-          <svg-icon icon-class="password" />
-        </span>
         <el-input
-          :key="passwordType"
           ref="password"
-          v-model="loginForm.password"
-          :type="passwordType"
+          v-model="user.password"
+          type="password"
           placeholder="密码"
           name="password"
           tabindex="2"
-          auto-complete="on"
-          @keyup.enter.native="handleLogin"
         />
-        <span
-          class="show-pwd"
-          @click="showPwd"
-        ><svg-icon :icon-class="passwordType === 'password' ? 'eye' : 'eye-open'" /></span>
+      </el-form-item>
+
+      <el-form-item prop="repeatPassword">
+        <el-input
+          v-model="user.repeatPassword"
+          type="password"
+          placeholder="再次输入密码，防止输入错误或者忘记"
+          name="repeatPassword"
+          tabindex="3"
+        />
+      </el-form-item>
+
+      <el-form-item label="公司或者组织的名称" prop="title">
+        <el-input
+          v-model="user.title"
+          placeholder="公司或者组织的名称"
+          name="title"
+          type="text"
+          tabindex="4"
+        />
+      </el-form-item>
+
+      <el-form-item label="联系人或者负责人" prop="contacts">
+        <el-input
+          v-model="user.contacts"
+          placeholder="联系人或者负责人"
+          name="contacts"
+          type="text"
+          tabindex="5"
+        />
+      </el-form-item>
+
+      <el-form-item label="联系地址" prop="address">
+        <el-input
+          v-model="user.address"
+          placeholder="联系地址"
+          name="address"
+          type="text"
+          tabindex="6"
+        />
       </el-form-item>
 
       <el-button
         :loading="loading"
         type="primary"
         style="width:100%;margin-bottom:30px;"
-        @click.native.prevent="handleLogin"
-      >Login</el-button>
+        @click.native.prevent="register"
+      >提交资料</el-button>
     </el-form></div>
 </template>
 
 <script>
+import { validateUsername, validatePassword, equalString } from '../../utils/validate';
+// import { isTelephone } from '@/utils/validate'
 export default {
-  data:
+  name: 'Register',
+  data() {
+    const validateRePassword = (rule, value, callback) => {
+      if (equalString(value, this.user.password)) {
+        callback()
+      } else {
+        callback('两次输入的密码不一致，请重新输入')
+      }
+    }
+    return {
+      loading: false,
+      user: {
+        username: '', // 用户名也是电话号码
+        password: '', // 登录密码
+        repeatPassword: '', // 密码再次确认
+        title: '', // 公司或者组织的名称
+        contacts: '', // 联系人或者负责人
+        address: '' // 联系地址
+      },
+      userRules: {
+        username: [
+          { required: true, message: '请输入电话号码作为登录用户名', trigger: 'blur' },
+          { required: true, trigger: 'blur', validator: validateUsername }
+        ],
+        password: [
+          { required: true, trigger: 'blur', message: '请输入密码' },
+          { validator: validatePassword }
+        ],
+        repeatPassword: [
+          { required: true, trigger: 'blur', message: '请输入确认密码' },
+          { validator: validateRePassword }
+        ],
+        title: [
+          { required: true, trigger: 'blur', message: ' 请输入公司或团队名称' },
+          { min: 3, max: 20, message: '长度在 3 到 20 个字符', trigger: 'blur' }
+        ]
+      }
+    }
+  },
+  methods: {
+    register() {
+      this.$refs.registerForm.validate((valid, errors) => {
+        if (valid) {
+          console.log('校验通过,提交数据');
+        } else {
+          console.log('错误信息', errors);
+          this.$alert('注册信息有误，请修改后重新提交', '提示');
+        }
+      });
+    }
+  }
 
 }
 </script>
@@ -82,7 +161,7 @@ $light_gray: #eee;
     margin: 20px auto;
   }
 
-  .login-form {
+  .register-form {
     position: relative;
     width: 520px;
     max-width: 100%;
