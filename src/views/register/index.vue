@@ -81,7 +81,14 @@
         style="width:100%;margin-bottom:30px;"
         @click.native.prevent="register"
       >提交资料</el-button>
-    </el-form></div>
+
+      <el-button
+        :loading="loading"
+        style="width:100%;margin-bottom:30px;"
+        @click.native.prevent="back"
+      >已有账号返回登录</el-button>
+    </el-form>
+  </div>
 </template>
 
 <script>
@@ -137,6 +144,9 @@ export default {
           this.$alert('注册信息有误，请修改后重新提交', '提示');
         }
       });
+    },
+    back() {
+      this.$router.go(-1)
     }
   }
 
