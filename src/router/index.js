@@ -61,23 +61,17 @@ export const constantRoutes = [
   },
 
   {
-    path: '/example',
+    path: '/trade',
     component: Layout,
-    redirect: '/example/table',
-    name: 'Example',
-    meta: { title: '订单管理', icon: 'example' },
+    redirect: '/trade/table',
+    name: 'trade',
+    meta: { title: '订单打印', icon: 'table' },
     children: [
       {
         path: 'table',
-        name: 'Table',
+        name: '订单管理',
         component: () => import('@/views/table/index'),
         meta: { title: '订单管理', icon: 'table' }
-      },
-      {
-        path: 'tree',
-        name: 'Tree',
-        component: () => import('@/views/tree/index'),
-        meta: { title: '打印管理', icon: 'tree' }
       }
     ]
   },
