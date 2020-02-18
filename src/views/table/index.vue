@@ -75,7 +75,7 @@
       />
       <el-table-column align="center" label="ID" width="95">
         <template slot-scope="scope">
-          {{ scope.$index }}
+          {{ scope.$index +1 }}
         </template>
       </el-table-column>
       <el-table-column label="Title">
@@ -106,10 +106,39 @@
       </el-table-column>
 
       <el-table-column type="expand">
-        <template v-slot="test">
-          abcd{{ test.row }}
+        <template v-slot="data">
+          abcd{{ data.row }}
         </template>
       </el-table-column>
+      <template v-slot:append>
+        <div class="pagination">
+          <el-pagination
+            background
+            layout="prev, pager, next"
+            :total="100"
+            page-size="20"
+          />
+        </div>
+        <div class="template-choice">选择打印模版：邮政电子面单</div>
+        <div class="action-button">
+          <el-button>打印快递单</el-button>
+          <el-button>打印多份</el-button>
+          <el-button>打印发货单</el-button>
+          <el-button>发货</el-button>
+          <el-dropdown split-button type="primary">
+            其他操作
+            <el-dropdown-menu slot="dropdown">
+              <el-dropdown-item>合并订单</el-dropdown-item>
+              <el-dropdown-item>收回单号</el-dropdown-item>
+              <el-dropdown-item>保存单号</el-dropdown-item>
+              <el-dropdown-item>修改重量</el-dropdown-item>
+              <el-dropdown-item>修改备注</el-dropdown-item>
+              <el-dropdown-item>修复发货人</el-dropdown-item>
+              <el-dropdown-item>快递线下下单</el-dropdown-item>
+            </el-dropdown-menu>
+          </el-dropdown>
+        </div>
+      </template>
     </el-table>
   </div>
 </template>
@@ -148,3 +177,20 @@ export default {
   }
 }
 </script>
+
+<style scoped>
+.template-choice{
+  padding: 10px 20px;
+}
+.action-button{
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 10px;
+}
+.pagination{
+  display: flex;
+  justify-content: flex-end;
+  padding: 12px;
+}
+</style>

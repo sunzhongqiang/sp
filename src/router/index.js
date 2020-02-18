@@ -52,11 +52,12 @@ export const constantRoutes = [
     path: '/',
     component: Layout,
     redirect: '/dashboard',
+    meta: { title: '首页', icon: 'dashboard' },
     children: [{
       path: 'dashboard',
       name: 'home',
       component: () => import('@/views/dashboard/index'),
-      meta: { title: 'home', icon: 'dashboard' }
+      meta: { title: '首页', icon: 'dashboard' }
     }]
   },
 
@@ -65,13 +66,13 @@ export const constantRoutes = [
     component: Layout,
     redirect: '/trade/table',
     name: 'trade',
-    meta: { title: 'trade', icon: 'table' },
+    meta: { title: '订单打印', icon: 'table' },
     children: [
       {
         path: 'table',
         name: 'trade-print',
         component: () => import('@/views/table/index'),
-        meta: { title: 'trade', icon: 'table' }
+        meta: { title: '订单打印', icon: 'table' }
       }
     ]
   },
@@ -82,7 +83,7 @@ export const constantRoutes = [
     redirect: '/nested/menu1',
     name: 'Nested',
     meta: {
-      title: 'setting',
+      title: '设置',
       icon: 'nested'
     },
     children: [
@@ -90,17 +91,17 @@ export const constantRoutes = [
         path: 'menu1',
         component: () => import('@/views/nested/menu1/index'), // Parent router-view
         name: 'Menu1',
-        meta: { title: 'setting1' }
+        meta: { title: '打印设置' }
       },
       {
         path: 'menu2',
         component: () => import('@/views/nested/menu1/index'),
-        meta: { title: 'setting2' }
+        meta: { title: '店铺管理' }
       },
       {
         path: 'menu3',
         component: () => import('@/views/nested/menu1/index'),
-        meta: { title: 'setting3' }
+        meta: { title: '用户信息' }
       }
     ]
   },
