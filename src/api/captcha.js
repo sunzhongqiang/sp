@@ -1,4 +1,4 @@
-import { get, post } from '@/lib/baseapi'
+import { get } from '@/lib/baseapi'
 
 export default {
   /**

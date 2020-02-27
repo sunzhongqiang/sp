@@ -61,49 +61,58 @@
           <el-button type="primary" @click="editUserAccount">修改主账号</el-button>
         </template>
         <el-button type="" @click="showResetPasswordForm">重置密码</el-button>
-        <el-button @click="showSubUserForm">添加子账号</el-button>
+        <el-button @click="showSubUserForm">添加员工账号</el-button>
       </el-form-item>
     </el-form>
 
     <el-table
-      :data="tableData"
+      :data="subUserData"
       style="width: 100%;margin-top:12px"
       border
     >
       <el-table-column
-        prop="date"
-        label="子账号"
+        prop="telephone"
+        label="员工账号"
       />
       <el-table-column
-        prop="date"
+        prop="usernick"
         label="使用人"
       />
       <el-table-column
-        prop="name"
+        prop="created"
         label="创建时间"
+        :formatter="formatterDate"
       />
       <el-table-column
-        prop="address"
+        prop="status"
         label="状态"
+        :formatter="formatterStatus"
       />
       <el-table-column
         prop="address"
         label="管理"
-      />
-      <template>
-        <el-button>禁用</el-button>
-        <el-button>删除</el-button>
-        <el-button>修改</el-button>
-      </template>
+      >
+        <template v-slot="scop">
+          <el-button size="mini" @click="toggleStatus(scop.row.id)">{{ scop.row.status == 'enable' ? '禁用':'启用' }}</el-button>
+          <el-button size="mini" type="danger">删除</el-button>
+        </template>
+      </el-table-column>
     </el-table>
+    <div style="display:flex;justify-content:flex-end;padding:8px">
+      <el-pagination
+        background
+        layout="prev, pager, next"
+        :total="totalSubUser"
+      />
+    </div>
 
     <el-drawer
       title="添加子账号"
-      :visible.sync="drawer"
+      :visible.sync="subUserDrawer"
       :with-header="false"
     >
-      <el-form ref="form" :model="subUser" :rules="subUserRules" class="form" size="normal" label-width="120px">
-        <el-form-item label="子账号" prop="telephone">
+      <el-form ref="subUserForm" :model="subUser" :rules="subUserRules" class="form" size="normal" label-width="120px">
+        <el-form-item label="员工账号" prop="telephone">
           <el-input v-model="subUser.telephone" placeholder="子账号" style="width:200px" />
         </el-form-item>
         <el-form-item label="使用人" prop="usernick">
@@ -130,11 +139,12 @@
           <el-input v-model="subUser.memo" placeholder="备注" />
         </el-form-item>
         <el-form-item>
-          <el-button type="primary" @click="submitData('form')">立即创建</el-button>
-          <el-button @click="cancleDrawer">取消</el-button>
+          <el-button type="primary" @click="saveSubUser('subUserForm')">立即创建</el-button>
+          <el-button @click="canclesubUser">取消</el-button>
         </el-form-item>
       </el-form>
     </el-drawer>
+
     <el-drawer
       title="重置密码"
       :visible.sync="resetPasswordDrawer"
@@ -163,6 +173,7 @@
 <script>
 import { validatePassword, equalString, validateTelephone } from '../../utils/validate';
 import userApi, { userInfoApi } from '@/api/user'
+import subUserApi from '@/api/subUser'
 import moment from 'moment'
 export default {
   data() {
@@ -175,10 +186,11 @@ export default {
     }
 
     return {
-      drawer: false,
+      subUserDrawer: false,
       resetPasswordDrawer: false,
       isEdit: false,
-      tableData: null,
+      subUserData: null,
+      totalSubUser: 0,
       user: {
         usernick: '',
         address: '',
@@ -244,6 +256,7 @@ export default {
   },
   mounted() {
     this.loadUserInfo()
+    this.loadSubUser();
   },
   methods: {
     saveUserAccount() {
@@ -261,10 +274,10 @@ export default {
       this.isEdit = true;
     },
     showSubUserForm() {
-      this.drawer = true
+      this.subUserDrawer = true
     },
-    cancleDrawer() {
-      this.drawer = false
+    canclesubUser() {
+      this.subUserDrawer = false
     },
 
     showResetPasswordForm() {
@@ -297,8 +310,56 @@ export default {
             }
           )
         }
-      });
+      })
+    },
+    /**
+     * 添加子账号
+     */
+    saveSubUser(formid) {
+      this.$refs[formid].validate(valid => {
+        if (valid) {
+          const userId = this.$store.state.user.id;
+          this.subUser.userId = userId
+          console.log('save sub user data', this.subUser)
+          subUserApi.save(this.subUser).then(result => {
+            if (result.success) {
+              this.subUserDrawer = false;
+              this.loadSubUser();
+            } else {
+              this.$alert(result.msg, '提示')
+            }
+          })
+        }
+      })
+    },
+    /**
+     * 加载用户的员工用户数据
+     */
+    async loadSubUser() {
+      const userId = this.$store.state.user.id;
+      const result = await subUserApi.loadData(userId);
+      this.subUserData = result.data.content.content;
+      this.totalSubUser = result.data.content.totalElements
+    },
+
+    formatterDate(row, column) {
+      return moment(row.created).format('YYYY-MM-DD HH:mm:ss')
+    },
+
+    formatterStatus(row, column) {
+      if (row.status === 'enable') {
+        return '可用'
+      } else {
+        return '禁用'
+      }
+    },
+    async toggleStatus(id) {
+      const result = await subUserApi.toggleStatus(id);
+      if (result.success) {
+        this.loadSubUser();
+      }
     }
+
   }
 }
 </script>
