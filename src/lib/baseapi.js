@@ -28,3 +28,9 @@ export function payload(url, data) {
 export function post(url, data) {
   return request.post(url, QS.stringify(data))
 }
+/**
+ * delete 方法
+ */
+export function deleteUrl(url, params) {
+  return request.delete(url, params)
+}

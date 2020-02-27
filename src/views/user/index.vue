@@ -94,7 +94,7 @@
       >
         <template v-slot="scop">
           <el-button size="mini" @click="toggleStatus(scop.row.id)">{{ scop.row.status == 'enable' ? '禁用':'启用' }}</el-button>
-          <el-button size="mini" type="danger">删除</el-button>
+          <el-button size="mini" type="danger" @click="deleteSubUser(scop.row.id)">删除</el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -353,8 +353,18 @@ export default {
         return '禁用'
       }
     },
+    /**
+     * 切换员工状态
+     */
     async toggleStatus(id) {
       const result = await subUserApi.toggleStatus(id);
+      if (result.success) {
+        this.loadSubUser();
+      }
+    },
+
+    async deleteSubUser(id) {
+      const result = await subUserApi.delete(id)
       if (result.success) {
         this.loadSubUser();
       }

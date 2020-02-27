@@ -1,4 +1,4 @@
-import { get, payload, post } from '@/lib/baseapi'
+import { get, payload, post, deleteUrl } from '@/lib/baseapi'
 
 export default {
   save(data) {
@@ -9,5 +9,8 @@ export default {
   },
   toggleStatus(id) {
     return post('/subUser/toggleStatus', { id })
+  },
+  delete(id) {
+    return deleteUrl('/subUser/' + id)
   }
 }
