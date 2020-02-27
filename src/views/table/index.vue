@@ -1,7 +1,7 @@
 <template>
   <div class="app-container">
     <el-form :inline="true" class="demo-form-inline" size="mini">
-      <el-form-item>
+      <el-form-item name="aa">
         <el-select value="下单时间">
           <el-option label="下单时间" value="下单时间" />
           <el-option label="付款时间" value="付款时间" />
@@ -9,7 +9,7 @@
           <el-option label="发货时间" value="发货时间" />
         </el-select>
       </el-form-item>
-      <el-form-item>
+      <el-form-item name="ab">
         <el-date-picker
           type="daterange"
           align="right"
@@ -19,7 +19,7 @@
           end-placeholder="结束日期"
         />
       </el-form-item>
-      <el-form-item>
+      <el-form-item name="ac">
         <el-select value="全部">
           <el-option label="全部" value="全部" />
           <el-option label="未付款" value="未付款" />
@@ -29,7 +29,7 @@
           <el-option label="预发货" value="预发货" />
         </el-select>
       </el-form-item>
-      <el-form-item>
+      <el-form-item name="ad">
         <el-select value="快递单未打印">
           <el-option label="快递单未打印" value="快递单未打印" />
           <el-option label="快递单已打印" value="快递单已打印" />
@@ -39,75 +39,65 @@
           <el-option label="发货单未打印+已打印" value="发货单未打印+已打印" />
         </el-select>
       </el-form-item>
-      <el-form-item>
+      <el-form-item name="ae">
         <el-input placeholder="手机号码" />
       </el-form-item>
-      <el-form-item>
+      <el-form-item name="af">
         <el-input placeholder="运单号" />
       </el-form-item>
-      <el-form-item>
+      <el-form-item name="ba">
         <el-input placeholder="订单号" />
       </el-form-item>
-      <el-form-item>
+      <el-form-item name="bb">
         <el-input placeholder="运单号" />
       </el-form-item>
-      <el-form-item>
+      <el-form-item name="bc">
         <el-input placeholder="收货区县" />
       </el-form-item>
-      <el-form-item>
+      <el-form-item name="bd">
         <el-input placeholder="商品ID" />
       </el-form-item>
-      <el-form-item>
+      <el-form-item name="a">
         <el-button type="primary">查询</el-button>
+        <el-button type="primary" @click="toggleExpand">展开/关闭</el-button>
       </el-form-item>
+
     </el-form>
     <el-table
+      ref="trade-table"
       v-loading="listLoading"
       :data="list"
       element-loading-text="Loading"
       border
       fit
       highlight-current-row
+      @select="selectTable"
     >
       <el-table-column
         type="selection"
         width="55"
       />
-      <el-table-column align="center" label="ID" width="95">
+      <el-table-column label="订单编号">
         <template slot-scope="scope">
-          {{ scope.$index +1 }}
-        </template>
-      </el-table-column>
-      <el-table-column label="Title">
-        <template slot-scope="scope">
-          {{ scope.row.title }}
-        </template>
-      </el-table-column>
-      <el-table-column label="Author" width="110" align="center">
-        <template slot-scope="scope">
-          <span>{{ scope.row.author }}</span>
-        </template>
-      </el-table-column>
-      <el-table-column label="Pageviews" width="110" align="center">
-        <template slot-scope="scope">
-          {{ scope.row.pageviews }}
-        </template>
-      </el-table-column>
-      <el-table-column class-name="status-col" label="Status" width="110" align="center">
-        <template slot-scope="scope">
-          <el-tag :type="scope.row.status | statusFilter">{{ scope.row.status }}</el-tag>
-        </template>
-      </el-table-column>
-      <el-table-column align="center" prop="created_at" label="Display_time" width="200">
-        <template slot-scope="scope">
-          <i class="el-icon-time" />
-          <span>{{ scope.row.display_time }}</span>
+          <div class="trade-summary">
+            <div>
+              订单编号：{{ scope.row.tradeNo }} 买家备注：{{ scope.row.memo }}
+            </div>
+            <div>目的地：{{ scope.row.province }}-{{ scope.row.city }}-{{ scope.row.county }}</div>
+          </div>
         </template>
       </el-table-column>
 
+      <el-table-column class-name="status-col" label="状态" width="320" align="center">
+        <template slot-scope="scope">
+          <i class="el-icon-time" />
+          <span>{{ scope.row.created }}</span>
+          <el-tag effect="dark" :type="scope.row.status | statusFilter">{{ scope.row.status }}</el-tag>
+        </template>
+      </el-table-column>
       <el-table-column type="expand">
-        <template v-slot="data">
-          abcd{{ data.row }}
+        <template v-slot>
+          <item />
         </template>
       </el-table-column>
       <template v-slot:append>
@@ -116,7 +106,7 @@
             background
             layout="prev, pager, next"
             :total="100"
-            page-size="20"
+            :page-size="10"
           />
         </div>
         <div class="template-choice">选择打印模版：邮政电子面单</div>
@@ -145,20 +135,25 @@
 
 <script>
 import { getList } from '@/api/table'
+import Item from '@/components/Item'
 
 export default {
+  components: {
+    Item
+  },
   filters: {
     statusFilter(status) {
       const statusMap = {
-        published: 'success',
-        draft: 'gray',
-        deleted: 'danger'
+        '已发货': 'success',
+        '已关闭': 'info',
+        '待发货': 'danger'
       }
       return statusMap[status]
     }
   },
   data() {
     return {
+      isExpand: true,
       list: null,
       listLoading: true
     }
@@ -173,6 +168,18 @@ export default {
         this.list = response.data.items
         this.listLoading = false
       })
+    },
+    toggleExpand(value) {
+      this.isExpand = !this.isExpand;
+      const table = this.$refs['trade-table'];
+      for (const row of this.list) {
+        console.log('row', row);
+        table.toggleRowExpansion(row, !this.isExpand)
+      }
+    },
+    selectTable(selection, row) {
+      console.log(arguments)
+      this.$refs['trade-table'].toggleRowExpansion(selection)
     }
   }
 }
@@ -192,5 +199,9 @@ export default {
   display: flex;
   justify-content: flex-end;
   padding: 12px;
+}
+.trade-summary{
+  display: flex;
+  justify-content:space-between;
 }
 </style>

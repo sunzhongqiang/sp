@@ -1,6 +1,5 @@
-/**
- * Created by PanJiaChen on 16/11/18.
- */
+import captcha from '@/api/captcha'
+import { existTelephone } from '@/api/user'
 
 /**
  * @param {string} path
@@ -24,7 +23,6 @@ export function validUsername(str) {
  * @param {string} tel
  */
 export function isTelephone(tel) {
-  console.log('校验电话号码：', tel)
   if (/^1(3|4|5|6|7|8|9)\d{9}$/.test(tel)) {
     return true;
   }
@@ -74,9 +72,27 @@ export function validateUsername(rule, value, callback) {
   if (!isTelephone(value)) {
     callback(new Error('请输入正确的电话号码'))
   } else {
+    console.log('检查电话号码是否存在');
+    existTelephone(value).then(result => {
+      if (result.success) {
+        if (result.data.exist) {
+          callback(new Error('电话号码已经被注册，请使用另外的电话号码'))
+        } else {
+          callback()
+        }
+      }
+    })
+  }
+}
+
+export function validateTelephone(rule, value, callback) {
+  if (!isTelephone(value)) {
+    callback(new Error('请输入正确的电话号码'))
+  } else {
     callback()
   }
 }
+
 export function validatePassword(rule, value, callback) {
   if (value.length < 6) {
     callback(new Error('密码不能低于6为数'))
@@ -84,12 +100,24 @@ export function validatePassword(rule, value, callback) {
     callback()
   }
 }
-
-export function validateRePassword(rule, value, callback, a, b) {
-  console.log('repassword', arguments)
-  if (value.length < 6) {
-    callback(new Error('密码不能低于6为数'))
-  } else {
-    callback()
-  }
+/**
+ *  验证验证码是否正确
+ * @param {*} rule ， 规则
+ * @param {*} value  值
+ * @param {*} callback 回调
+ */
+export function validateCaptcha(rule, value, callback) {
+  console.log('validateCaptcha', value);
+  captcha.verifyCaptcha(value).then(result => {
+    if (result.success) {
+      if (result.data.equal) {
+        callback()
+      } else {
+        callback(new Error('验证码不正确'))
+      }
+    } else {
+      callback(new Error('验证码不正确'))
+    }
+  })
 }
+

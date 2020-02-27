@@ -3,11 +3,15 @@ import Mock from 'mockjs'
 const data = Mock.mock({
   'items|6': [{
     id: '@id',
-    title: '@sentence(10, 20)',
-    'status|1': ['published', 'draft', 'deleted'],
-    author: 'name',
-    display_time: '@datetime',
-    pageviews: '@integer(300, 5000)'
+    tradeNo: '@natural(11)',
+    memo: '@ctitle(10, 15)',
+    'status|1': ['待发货', '已发货', '已关闭'],
+    'printStatus|1': ['未打印', '已打印'],
+    created: '@datetime',
+    province: '@province',
+    city: '@city',
+    county: '@county',
+    pageviews: '@image(50x50)'
   }]
 })
 

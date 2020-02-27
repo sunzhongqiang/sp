@@ -1,5 +1,6 @@
 import Vue from 'vue'
 import Vuex from 'vuex'
+import createLogger from 'vuex/dist/logger'
 import getters from './getters'
 import app from './modules/app'
 import settings from './modules/settings'
@@ -13,7 +14,8 @@ const store = new Vuex.Store({
     settings,
     user
   },
-  getters
+  getters,
+  plugins: [createLogger()]
 })
 
 export default store

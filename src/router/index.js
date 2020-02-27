@@ -52,6 +52,7 @@ export const constantRoutes = [
     path: '/',
     component: Layout,
     redirect: '/dashboard',
+    name: 'home',
     meta: { title: '首页', icon: 'dashboard' },
     children: [{
       path: 'dashboard',
@@ -89,18 +90,23 @@ export const constantRoutes = [
     children: [
       {
         path: 'menu1',
-        component: () => import('@/views/nested/menu1/index'), // Parent router-view
+        component: () => import('@/views/print'), // Parent router-view
         name: 'Menu1',
-        meta: { title: '打印设置' }
+        meta: { title: '电子面单' }
       },
       {
-        path: 'menu2',
-        component: () => import('@/views/nested/menu1/index'),
+        path: 'shop',
+        component: () => import('@/views/shop'),
         meta: { title: '店铺管理' }
       },
       {
-        path: 'menu3',
-        component: () => import('@/views/nested/menu1/index'),
+        path: 'sender',
+        component: () => import('@/views/sender'),
+        meta: { title: '常用发货人' }
+      },
+      {
+        path: 'user',
+        component: () => import('@/views/user'),
         meta: { title: '用户信息' }
       }
     ]

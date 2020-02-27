@@ -40,47 +40,68 @@
           name="password"
           tabindex="2"
           auto-complete="on"
-          @keyup.enter.native="handleLogin"
         />
         <span
           class="show-pwd"
           @click="showPwd"
         ><svg-icon :icon-class="passwordType === 'password' ? 'eye' : 'eye-open'" /></span>
       </el-form-item>
+      <el-form-item prop="captcha">
+        <el-col :span="18">
+          <el-input
+            v-model="loginForm.captcha"
+            name="captcha"
+            style="width:160px"
+            placeholder="验证码"
+            @keyup.enter.native="validateLoginForm"
+          />
+        </el-col>
+        <el-col :span="6">
+          <div class="captcha">
+            <img :src="captcha" @click="refreshCaptcha">
+          </div>
+        </el-col>
+      </el-form-item>
 
       <el-button
         :loading="loading"
         type="primary"
         style="width:100%;margin-bottom:30px;"
-        @click.native.prevent="handleLogin"
-      >Login</el-button>
+        @click.native.prevent="validateLoginForm"
+      >登录</el-button>
 
-      <el-button
-        :loading="loading"
-        style="width:100%;margin-bottom:30px;"
-        @click.native.prevent="handlerRegister"
-      >Register</el-button>
+      <div class="register">
+        <el-link href="#/register" type="primary">没有账号，先注册一个吧</el-link>
+      </div>
     </el-form>
   </div>
 </template>
 
 <script>
-import { validateUsername, validatePassword } from '@/utils/validate'
-
+import { validateTelephone, validatePassword, validateCaptcha } from '@/utils/validate'
+import captcha from '@/api/captcha'
+import { setLogin } from '@/utils/auth'
+import loginApi from '@/api/login'
 export default {
   name: 'Login',
   data() {
     return {
+      captcha: 'data:image/jpg;base64,',
       loginForm: {
-        username: 'admin',
-        password: '111111'
+        username: '18669996211',
+        password: '123456',
+        captcha: ''
       },
       loginRules: {
         username: [
-          { required: true, trigger: 'blur', validator: validateUsername }
+          { required: true, trigger: 'blur', validator: validateTelephone }
         ],
         password: [
           { required: true, trigger: 'blur', validator: validatePassword }
+        ],
+        captcha: [
+          { required: true, trigger: 'blur', message: '请输入验证码' },
+          { validator: validateCaptcha }
         ]
       },
       loading: false,
@@ -96,6 +117,9 @@ export default {
       immediate: true
     }
   },
+  mounted() {
+    this.loadCaptcha();
+  },
   methods: {
     showPwd() {
       if (this.passwordType === 'password') {
@@ -107,28 +131,52 @@ export default {
         this.$refs.password.focus()
       })
     },
-    handleLogin() {
+    validateLoginForm() {
       this.$refs.loginForm.validate(valid => {
         if (valid) {
-          this.loading = true
-          this.$store
-            .dispatch('user/login', this.loginForm)
-            .then(() => {
-              this.$router.push({ path: this.redirect || '/' })
-              this.loading = false
-            })
-            .catch(() => {
-              this.loading = false
-            })
+          this.login();
         } else {
           console.log('error submit!!')
           return false
         }
       })
     },
+    async login() {
+      this.loading = true
+      try {
+        const result = await loginApi.login(this.loginForm)
+        console.log('login result', result);
+        this.loading = false;
+        if (result.success) {
+          this.$store.commit('user/currentUser', result.data)
+          setLogin(result.data);
+
+          this.$router.push({ path: this.redirect || '/' })
+        } else {
+          this.loading = false;
+          this.$alert(result.msg, '提示')
+        }
+      } catch (error) {
+        this.loading = false;
+        this.$alert(JSON.stringify(error), '提示')
+      }
+    },
     handlerRegister() {
-      console.log('handlerRegister');
       this.$router.push({ path: '/register' })
+    },
+    loadCaptcha() {
+      console.log('load captcha');
+      captcha.captcha().then(result => {
+        console.log(result);
+        if (result.success) {
+          this.captcha = 'data:image/jpg;base64,' + result.data.captcha
+        }
+      }).catch(error => {
+        console.error('load captcha', error);
+      })
+    },
+    refreshCaptcha() {
+      this.loadCaptcha();
     }
   }
 }
@@ -242,5 +290,15 @@ $light_gray: #eee;
     cursor: pointer;
     user-select: none;
   }
+}
+.captcha{
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 45px;
+}
+.register{
+  display: flex;
+  justify-content: flex-end;
 }
 </style>

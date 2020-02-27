@@ -1,24 +1,36 @@
-import request from '@/utils/request'
+import { get, payload, post } from '@/lib/baseapi'
 
-export function login(data) {
-  return request({
-    url: '/vue-admin-template/user/login',
-    method: 'post',
-    data
-  })
+export function register(data) {
+  return payload('/user/register', data)
 }
 
-export function getInfo(token) {
-  return request({
-    url: '/vue-admin-template/user/info',
-    method: 'get',
-    params: { token }
-  })
+export function existTelephone(telephone) {
+  return get('/user/exist/telephone', { telephone })
 }
 
-export function logout() {
-  return request({
-    url: '/vue-admin-template/user/logout',
-    method: 'post'
-  })
+export function currentUser() {
+  return get('/user/current')
+}
+
+export function userInfoApi(telephone) {
+  return get('/user/info/' + telephone)
+}
+
+export default {
+  updateUser(data) {
+    return post('/userAccount', data);
+  },
+  /**
+   * 重置密码
+   * @param {String} userId
+   * @param {String} oldPassword
+   * @param {String} newPassword
+   */
+  resetPassword(userId, oldPassword, newPassword) {
+    return post('/resetPassword', {
+      userId,
+      newPassword,
+      oldPassword
+    })
+  }
 }

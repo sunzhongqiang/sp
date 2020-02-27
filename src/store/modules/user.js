@@ -1,9 +1,11 @@
 import { login, logout, getInfo } from '@/api/user'
-import { getToken, setToken, removeToken } from '@/utils/auth'
+import { getToken, setToken, removeToken, getUserId, getUserTelephone } from '@/utils/auth'
 import { resetRouter } from '@/router'
 
 const getDefaultState = () => {
   return {
+    id: getUserId(),
+    telephone: getUserTelephone(),
     token: getToken(),
     name: '',
     avatar: ''
@@ -24,6 +26,10 @@ const mutations = {
   },
   SET_AVATAR: (state, avatar) => {
     state.avatar = avatar
+  },
+  currentUser(state, data) {
+    state.id = data['id'];
+    state.telephone = data.telephone
   }
 }
 

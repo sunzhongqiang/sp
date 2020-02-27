@@ -12,12 +12,12 @@
         <h3 class="title">账号注册</h3>
       </div>
 
-      <el-form-item prop="username">
+      <el-form-item prop="telephone">
         <el-input
-          ref="username"
-          v-model="user.username"
+          ref="telephone"
+          v-model="user.telephone"
           placeholder="用户名"
-          name="username"
+          name="telephone"
           type="text"
           tabindex="1"
           auto-complete="on"
@@ -82,18 +82,16 @@
         @click.native.prevent="register"
       >提交资料</el-button>
 
-      <el-button
-        :loading="loading"
-        style="width:100%;margin-bottom:30px;"
-        @click.native.prevent="back"
-      >已有账号返回登录</el-button>
+      <div class="register">
+        <el-link href="#/login" type="primary">已有账号返回登录</el-link>
+      </div>
     </el-form>
   </div>
 </template>
 
 <script>
 import { validateUsername, validatePassword, equalString } from '../../utils/validate';
-// import { isTelephone } from '@/utils/validate'
+import { register as registerApi } from '@/api/user'
 export default {
   name: 'Register',
   data() {
@@ -107,7 +105,8 @@ export default {
     return {
       loading: false,
       user: {
-        username: '', // 用户名也是电话号码
+        usernick: '', // 用户名姓名
+        telephone: '', // 用户名也是电话号码
         password: '', // 登录密码
         repeatPassword: '', // 密码再次确认
         title: '', // 公司或者组织的名称
@@ -115,7 +114,7 @@ export default {
         address: '' // 联系地址
       },
       userRules: {
-        username: [
+        telephone: [
           { required: true, message: '请输入电话号码作为登录用户名', trigger: 'blur' },
           { required: true, trigger: 'blur', validator: validateUsername }
         ],
@@ -139,11 +138,21 @@ export default {
       this.$refs.registerForm.validate((valid, errors) => {
         if (valid) {
           console.log('校验通过,提交数据');
+          this.sendRegisterData(this.user)
         } else {
           console.log('错误信息', errors);
           this.$alert('注册信息有误，请修改后重新提交', '提示');
         }
       });
+    },
+    async sendRegisterData(data) {
+      const result = await registerApi(data);
+      console.log(result);
+      if (result.success) {
+        this.$alert('注册成功', '提示').then(result => {
+          this.$router.push('/login')
+        })
+      }
     },
     back() {
       this.$router.go(-1)
