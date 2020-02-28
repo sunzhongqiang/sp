@@ -102,7 +102,7 @@ export const constantRoutes = [
       {
         path: 'sender',
         component: () => import('@/views/sender'),
-        meta: { title: '常用发货人' }
+        meta: { title: '地址管理' }
       },
       {
         path: 'user',

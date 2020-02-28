@@ -58,14 +58,14 @@
           <el-button type="primary" @click="saveUserAccount">保存</el-button>
         </template>
         <template v-else>
-          <el-button type="primary" @click="editUserAccount">修改主账号</el-button>
+          <el-button type="primary" @click="editUserAccount">更新账号信息</el-button>
         </template>
-        <el-button type="" @click="showResetPasswordForm">重置密码</el-button>
-        <el-button @click="showSubUserForm">添加员工账号</el-button>
+        <el-button type="warning" @click="showResetPasswordForm">重置密码</el-button>
+        <!-- <el-button @click="showSubUserForm">添加员工账号</el-button> -->
       </el-form-item>
     </el-form>
 
-    <el-table
+    <!-- <el-table
       :data="subUserData"
       style="width: 100%;margin-top:12px"
       border
@@ -143,7 +143,7 @@
           <el-button @click="canclesubUser">取消</el-button>
         </el-form-item>
       </el-form>
-    </el-drawer>
+    </el-drawer> -->
 
     <el-drawer
       title="重置密码"

@@ -11,29 +11,36 @@
       border
     >
       <el-table-column
-        prop="date"
+        prop="sender"
         label="发货人"
       />
+
       <el-table-column
-        prop="date"
-        label="发货地址"
-      />
-      <el-table-column
-        prop="name"
+        prop="telephone"
         label="电话"
       />
       <el-table-column
-        prop="address"
-        label="备注"
-      />
+        label="地区"
+      >
+        <template v-slot="scop">
+          <span>{{ scop.row.province }}</span>
+          <span>{{ scop.row.city }}</span>
+          <span>{{ scop.row.county }}</span>
+        </template>
+      </el-table-column>
       <el-table-column
         prop="address"
-        label="管理"
+        label="地址"
       />
-      <template>
-        <el-button>编辑</el-button>
-        <el-button>默认发货人</el-button>
-      </template>
+      <el-table-column
+        label="管理"
+      >
+        <template v-slot="scop">
+          <el-button>编辑</el-button>
+          <el-button :disabled="scop.row.isDefault">默认发货人</el-button>
+        </template>
+      </el-table-column>
+
     </el-table>
     <el-drawer
       title="添加发货人"
@@ -82,6 +89,7 @@
 <script>
 import { regionData, CodeToText } from 'element-china-area-data'
 import { validateTelephone } from '@/utils/validate'
+import addressApi from '@/api/address'
 export default {
   data() {
     return {
@@ -93,8 +101,11 @@ export default {
         sender: '',
         telephone: '',
         province: '',
+        provinceCode: '',
         city: '',
+        cityCode: '',
         county: '',
+        countyCode: '',
         address: '',
         zipcode: '',
         isDefault: true,
@@ -120,6 +131,9 @@ export default {
       }
     };
   },
+  mounted() {
+    this.loadData(0);
+  },
   methods: {
     addSender() {
       this.drawer = true
@@ -128,6 +142,9 @@ export default {
       console.log('value', value)
       console.log('selectedOptions', this.selectedOptions)
       console.log('地区名称', CodeToText[value[0]], CodeToText[value[1]], CodeToText[value[2]])
+      this.senderFormData.provinceCode = value[0]
+      this.senderFormData.cityCode = value[1]
+      this.senderFormData.countyCode = value[2]
       this.senderFormData.province = CodeToText[value[0]]
       this.senderFormData.city = CodeToText[value[1]]
       this.senderFormData.county = CodeToText[value[2]]
@@ -136,15 +153,24 @@ export default {
       console.log(this.senderFormData);
       this.$refs[formName].validate((valid, error) => {
         if (valid) {
-          alert('submit!');
+          addressApi.save(this.senderFormData).then(result => {
+            if (result.success) {
+              this.drawer = false;
+              this.loadData(0);
+            }
+          })
         } else {
-          console.log('error submit!!', error);
-          return false;
+          this.$alert('地址中含有错误信息，请检查', '警告');
         }
       });
     },
     handlerDrawer() {
       this.drawer = false
+    },
+    async loadData(page) {
+      const result = await addressApi.loadData(page);
+      this.tableData = result.data.content.content;
+      console.log('this.tableData', this.tableData)
     }
 
   }
