@@ -36,8 +36,9 @@
         label="管理"
       >
         <template v-slot="scop">
-          <el-button>编辑</el-button>
-          <el-button :disabled="scop.row.isDefault">默认发货人</el-button>
+          <el-button type="primary" @click="edit(scop.row.id)">编辑</el-button>
+          <el-button :disabled="scop.row.isDefault" @click="toggleDefault(scop.row.id)">默认发货人</el-button>
+          <el-button :disabled="scop.row.isDefault" type="danger" @click="deleteAddress(scop.row.id)">删除</el-button>
         </template>
       </el-table-column>
 
@@ -58,6 +59,7 @@
         <el-form-item label="地区" prop="selectedOptions">
           <el-cascader
             v-model="senderFormData.selectedOptions"
+            :value="senderFormData.selectedOptions"
             :options="options"
             style="width:360px"
             @change="handleChange"
@@ -139,9 +141,6 @@ export default {
       this.drawer = true
     },
     handleChange(value) {
-      console.log('value', value)
-      console.log('selectedOptions', this.selectedOptions)
-      console.log('地区名称', CodeToText[value[0]], CodeToText[value[1]], CodeToText[value[2]])
       this.senderFormData.provinceCode = value[0]
       this.senderFormData.cityCode = value[1]
       this.senderFormData.countyCode = value[2]
@@ -165,12 +164,31 @@ export default {
       });
     },
     handlerDrawer() {
+      this.senderFormData.id = ''
       this.drawer = false
     },
     async loadData(page) {
       const result = await addressApi.loadData(page);
       this.tableData = result.data.content.content;
       console.log('this.tableData', this.tableData)
+    },
+    async edit(id) {
+      const data = await addressApi.find(id);
+      this.senderFormData = data;
+      this.senderFormData.selectedOptions = [data.provinceCode, data.cityCode, data.countyCode]
+      this.drawer = true;
+    },
+    async deleteAddress(id) {
+      const result = await addressApi.delete(id);
+      if (result.success) {
+        this.loadData();
+      }
+    },
+    async toggleDefault(id) {
+      const result = await addressApi.toggleDefault(id);
+      if (result.success) {
+        this.loadData();
+      }
     }
 
   }

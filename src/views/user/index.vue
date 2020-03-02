@@ -86,7 +86,7 @@
       <el-table-column
         prop="status"
         label="状态"
-        :formatter="formatterStatus"
+        :formatter="formatterEnableStatus"
       />
       <el-table-column
         prop="address"
@@ -342,17 +342,6 @@ export default {
       this.totalSubUser = result.data.content.totalElements
     },
 
-    formatterDate(row, column) {
-      return moment(row.created).format('YYYY-MM-DD HH:mm:ss')
-    },
-
-    formatterStatus(row, column) {
-      if (row.status === 'enable') {
-        return '可用'
-      } else {
-        return '禁用'
-      }
-    },
     /**
      * 切换员工状态
      */

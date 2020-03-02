@@ -14,5 +14,9 @@ export default {
   },
   delete(addressId) {
     return deleteUrl(`/address/${addressId}`)
+  },
+  toggleDefault(id) {
+    return get(`/address/toggleDefault/${id}`)
   }
+
 }

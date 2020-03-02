@@ -47,6 +47,17 @@ export const constantRoutes = [
     component: () => import('@/views/register'),
     hidden: true
   },
+  {
+    path: '/callback',
+    component: () => import('@/views/callback'),
+    hidden: true
+  },
+
+  {
+    path: '/error',
+    component: () => import('@/views/error'),
+    hidden: true
+  },
 
   {
     path: '/',
@@ -79,9 +90,9 @@ export const constantRoutes = [
   },
 
   {
-    path: '/nested',
+    path: '/setting',
     component: Layout,
-    redirect: '/nested/menu1',
+    redirect: '/setting/printbill',
     name: 'Nested',
     meta: {
       title: '设置',
@@ -89,9 +100,9 @@ export const constantRoutes = [
     },
     children: [
       {
-        path: 'menu1',
+        path: 'printbill',
         component: () => import('@/views/print'), // Parent router-view
-        name: 'Menu1',
+        name: 'printbill',
         meta: { title: '电子面单' }
       },
       {
