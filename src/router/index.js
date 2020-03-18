@@ -55,7 +55,7 @@ export const constantRoutes = [
 
   {
     path: '/error',
-    component: () => import('@/views/error'),
+    component: () => import('@/views/404'),
     hidden: true
   },
 
@@ -85,6 +85,12 @@ export const constantRoutes = [
         name: 'trade-print',
         component: () => import('@/views/table/index'),
         meta: { title: '订单打印', icon: 'table' }
+      },
+      {
+        path: 'free',
+        name: 'free-print',
+        component: () => import('@/views/freeprint/index'),
+        meta: { title: '自由打印', icon: 'el-icon-printer' }
       }
     ]
   },

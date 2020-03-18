@@ -1,4 +1,4 @@
-import { get, payload, deleteUrl } from '@/lib/baseapi'
+import { get, payload, deleteUrl, post } from '@/lib/baseapi'
 
 export default {
   loadData(page) {
@@ -17,6 +17,10 @@ export default {
   },
   toggleDefault(id) {
     return get(`/address/toggleDefault/${id}`)
+  },
+
+  analysis(text) {
+    return post('/analysis/address', { text })
   }
 
 }

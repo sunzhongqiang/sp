@@ -1,0 +1,51 @@
+const logisticsMap = {
+  'STO': { name: '申通快递', code: 'STO', no: '1' },
+  'HTKY': { name: '百世快递', code: 'HTKY', no: '3' },
+  'DBKD': { name: '德邦快递', code: 'DBKD', no: '131' },
+  'POSTB': { name: '中国邮政快递包裹', code: 'POSTB', no: '132' },
+  'EYB': { name: 'EMS经济快递', code: 'EYB', no: '' },
+  'GTO': { name: '国通快递', code: 'GTO', no: '124' },
+  'QFKD': { name: '全峰快递', code: 'QFKD', no: '' },
+  'ZJS': { name: '宅急送', code: 'ZJS', no: '129' },
+  'FAST': { name: '快捷快递', code: 'FAST', no: '' },
+  'EMS': { name: 'EMS标准', code: 'EMS', no: '' },
+  'SF': { name: '顺丰速运', code: 'SF', no: '44' },
+  'UC': { name: '优速快递', code: 'UC', no: '117' },
+  'BESTQJT': { name: '百世快运', code: 'BESTQJT', no: '229' },
+  'ZTO': { name: '中通快递', code: 'ZTO', no: '115' },
+  'TTKDEX': { name: '天天快递', code: 'TTKDEX', no: '119' },
+  'YTO': { name: '圆通快递', code: 'YTO', no: '85' },
+  'YUNDA': { name: '韵达快递', code: 'YUNDA', no: '121' },
+  'KYE': { name: '跨越速运', code: 'KYE', no: '183' },
+  'RRS': { name: '日日顺物流', code: 'RRS', no: '227' },
+  'SZKKE': { name: '京广速递', code: 'SZKKE', no: '281' },
+  'AIR': { name: '亚风速递', code: 'AIR', no: '317' },
+  'ZTOKY': { name: '中通快运', code: 'ZTOKY', no: '343' }
+};
+
+const logisticsArray = [
+  { name: '申通快递', code: 'STO', no: '1' },
+  { name: '百世快递', code: 'HTKY', no: '3' },
+  { name: '德邦快递', code: 'DBKD', no: '131' },
+  { name: '中国邮政快递包裹', code: 'POSTB', no: '132' },
+  { name: 'EMS经济快递', code: 'EYB', no: '' },
+  { name: '国通快递', code: 'GTO', no: '124' },
+  { name: '全峰快递', code: 'QFKD', no: '' },
+  { name: '宅急送', code: 'ZJS', no: '129' },
+  { name: '快捷快递', code: 'FAST', no: '' },
+  { name: 'EMS标准', code: 'EMS', no: '' },
+  { name: '顺丰速运', code: 'SF', no: '44' },
+  { name: '优速快递', code: 'UC', no: '117' },
+  { name: '百世快运', code: 'BESTQJT', no: '229' },
+  { name: '中通快递', code: 'ZTO', no: '115' },
+  { name: '天天快递', code: 'TTKDEX', no: '119' },
+  { name: '圆通快递', code: 'YTO', no: '85' },
+  { name: '韵达快递', code: 'YUNDA', no: '121' },
+  { name: '跨越速运', code: 'KYE', no: '183' },
+  { name: '日日顺物流', code: 'RRS', no: '227' },
+  { name: '京广速递', code: 'SZKKE', no: '281' },
+  { name: '亚风速递', code: 'AIR', no: '317' },
+  { name: '中通快运', code: 'ZTOKY', no: '343' }
+];
+
+export { logisticsArray, logisticsMap }

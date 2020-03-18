@@ -51,7 +51,7 @@
           <el-input
             v-model="loginForm.captcha"
             name="captcha"
-            style="width:160px"
+            style="width:330px"
             placeholder="验证码"
             @keyup.enter.native="validateLoginForm"
           />
