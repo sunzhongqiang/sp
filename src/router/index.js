@@ -122,6 +122,11 @@ export const constantRoutes = [
         meta: { title: '地址管理' }
       },
       {
+        path: 'department',
+        component: () => import('@/views/department'),
+        meta: { title: '部门设置' }
+      },
+      {
         path: 'user',
         component: () => import('@/views/user'),
         meta: { title: '用户信息' }

@@ -71,6 +71,11 @@
       >登录</el-button>
 
       <div class="register">
+        <el-switch
+          v-model="isSubUser"
+          active-text="主账号"
+          inactive-text="子账号"
+        />
         <el-link href="#/register" type="primary">没有账号，先注册一个吧</el-link>
       </div>
     </el-form>
@@ -87,6 +92,7 @@ export default {
   data() {
     return {
       captcha: 'data:image/jpg;base64,',
+      isSubUser: true,
       loginForm: {
         username: '18669996211',
         password: '123456',
@@ -134,7 +140,11 @@ export default {
     validateLoginForm() {
       this.$refs.loginForm.validate(valid => {
         if (valid) {
-          this.login();
+          if (this.isSubUser) {
+            this.login();
+          } else {
+            this.subUserLogin();
+          }
         } else {
           console.log('error submit!!')
           return false
@@ -145,12 +155,28 @@ export default {
       this.loading = true
       try {
         const result = await loginApi.login(this.loginForm)
-        console.log('login result', result);
         this.loading = false;
         if (result.success) {
           this.$store.commit('user/currentUser', result.data)
           setLogin(result.data);
-
+          this.$router.push({ path: this.redirect || '/' })
+        } else {
+          this.loading = false;
+          this.$alert(result.msg, '提示')
+        }
+      } catch (error) {
+        this.loading = false;
+        this.$alert(JSON.stringify(error), '提示')
+      }
+    },
+    async subUserLogin() {
+      this.loading = true
+      try {
+        const result = await loginApi.subUserLogin(this.loginForm)
+        this.loading = false;
+        if (result.success) {
+          this.$store.commit('user/currentUser', result.data)
+          setLogin(result.data);
           this.$router.push({ path: this.redirect || '/' })
         } else {
           this.loading = false;
@@ -299,6 +325,6 @@ $light_gray: #eee;
 }
 .register{
   display: flex;
-  justify-content: flex-end;
+  justify-content: space-between;
 }
 </style>

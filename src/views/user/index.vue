@@ -61,11 +61,11 @@
           <el-button type="primary" @click="editUserAccount">更新账号信息</el-button>
         </template>
         <el-button type="warning" @click="showResetPasswordForm">重置密码</el-button>
-        <!-- <el-button @click="showSubUserForm">添加员工账号</el-button> -->
+        <el-button @click="showSubUserForm">添加员工账号</el-button>
       </el-form-item>
     </el-form>
 
-    <!-- <el-table
+    <el-table
       :data="subUserData"
       style="width: 100%;margin-top:12px"
       border
@@ -143,7 +143,7 @@
           <el-button @click="canclesubUser">取消</el-button>
         </el-form-item>
       </el-form>
-    </el-drawer> -->
+    </el-drawer>
 
     <el-drawer
       title="重置密码"
@@ -172,7 +172,7 @@
 </template>
 <script>
 import { validatePassword, equalString, validateTelephone } from '../../utils/validate';
-import userApi, { userInfoApi } from '@/api/user'
+import userApi from '@/api/user'
 import subUserApi from '@/api/subUser'
 import moment from 'moment'
 export default {
@@ -287,8 +287,7 @@ export default {
       this.resetPasswordDrawer = false
     },
     async loadUserInfo() {
-      const telephone = this.$store.state.user.telephone
-      const user = await userInfoApi(telephone);
+      const user = await userApi.currentUser();
       user.created = moment(user.created).format('YYYY-MM-DD')
       user.modified = moment(user.modified).format('YYYY-MM-DD')
       this.user = user;
@@ -336,8 +335,7 @@ export default {
      * 加载用户的员工用户数据
      */
     async loadSubUser() {
-      const userId = this.$store.state.user.id;
-      const result = await subUserApi.loadData(userId);
+      const result = await subUserApi.loadData();
       this.subUserData = result.data.content.content;
       this.totalSubUser = result.data.content.totalElements
     },

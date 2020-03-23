@@ -15,11 +15,6 @@
         <el-button type="primary" @click="downloadShopWaybill">获取已开的电子面单</el-button>
         <a href="https://mms.pinduoduo.com/logistics/open" />
         <waybill :content="waybillList" />
-        <el-alert
-          title="拼多多打印组件运行成功"
-          type="success"
-          effect="dark"
-        />
       </el-tab-pane>
       <el-tab-pane label="菜鸟电子面单" name="cainiao">
         <el-alert

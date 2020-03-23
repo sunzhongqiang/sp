@@ -8,15 +8,21 @@ export function existTelephone(telephone) {
   return get('/user/exist/telephone', { telephone })
 }
 
-export function currentUser() {
-  return get('/user/current')
-}
-
-export function userInfoApi(telephone) {
-  return get('/user/info/' + telephone)
+export function userInfoApi() {
+  return get('/user/info')
 }
 
 export default {
+  /**
+   * 当前用户
+   */
+  currentUser() {
+    return get('/user/current')
+  },
+  /**
+   * 更新用户信息
+   * @param {object} data
+   */
   updateUser(data) {
     return post('/userAccount', data);
   },

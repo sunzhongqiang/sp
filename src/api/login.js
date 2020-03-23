@@ -6,5 +6,8 @@ export default {
   },
   logout() {
     return post('/userlogout')
+  },
+  subUserLogin(data) {
+    return payload('/subUserLogin', data)
   }
 }
