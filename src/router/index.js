@@ -84,17 +84,56 @@ export const constantRoutes = [
         path: 'table',
         name: 'trade-print',
         component: () => import('@/views/table/index'),
-        meta: { title: '订单打印', icon: 'table' }
+        meta: { title: '订单打印' }
       },
       {
         path: 'free',
         name: 'free-print',
         component: () => import('@/views/freeprint/index'),
-        meta: { title: '自由打印', icon: 'el-icon-printer' }
+        meta: { title: '自由打印' }
       }
     ]
   },
-
+  {
+    path: '/aftersale',
+    component: Layout,
+    redirect: '/aftersale/question',
+    name: 'trade',
+    meta: { title: '售后问题', icon: 'table' },
+    children: [
+      {
+        path: 'question',
+        name: 'after-sale-question',
+        component: () => import('@/views/aftersale/question'),
+        meta: { title: '售后问题' }
+      },
+      {
+        path: 'category',
+        name: 'after-sale-category',
+        component: () => import('@/views/aftersale/category'),
+        meta: { title: '售后分类' }
+      }
+    ]
+  },
+  {
+    path: '/supply',
+    component: Layout,
+    redirect: '/supply/supplier',
+    name: 'trade',
+    meta: { title: '供应管理', icon: 'table' },
+    children: [
+      {
+        path: 'supplier',
+        component: () => import('@/views/supplier'),
+        meta: { title: '供应商' }
+      },
+      {
+        path: 'supplierGoods',
+        component: () => import('@/views/supply/goods'),
+        meta: { title: '采购商品' }
+      }
+    ]
+  },
   {
     path: '/setting',
     component: Layout,
@@ -120,6 +159,12 @@ export const constantRoutes = [
         path: 'sender',
         component: () => import('@/views/sender'),
         meta: { title: '地址管理' }
+      },
+
+      {
+        path: 'goodsCategory',
+        component: () => import('@/views/category'),
+        meta: { title: '商品分类' }
       },
       {
         path: 'department',

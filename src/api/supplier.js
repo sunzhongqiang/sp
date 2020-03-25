@@ -18,5 +18,14 @@ export default {
   },
   toggle(id) {
     return post(`/supplier/toggle/${id}`)
+  },
+  moveDown(id) {
+    return post(`/supplier/movedown/${id}`)
+  },
+  moveUp(id) {
+    return post(`/supplier/moveup/${id}`)
+  },
+  enableList() {
+    return get(`/supplier/enableList`)
   }
 }

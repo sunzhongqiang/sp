@@ -3,7 +3,7 @@
   <div class="app-container">
     <el-form :inline="true" size="mini">
       <el-form-item>
-        <el-button type="primary" icon="el-icon-circle-plus" @click="addModel">添加部门</el-button>
+        <el-button type="primary" icon="el-icon-circle-plus" @click="addModel">添加供应商 </el-button>
       </el-form-item>
     </el-form>
     <el-table
@@ -12,38 +12,20 @@
     >
 
       <el-table-column
-        prop="id"
-        label="主键"
-      />
-      <el-table-column
-        prop="userId"
-        label="用户"
-      />
-      <el-table-column
         prop="name"
         label="名称"
       />
       <el-table-column
         prop="status"
         label="状态"
+        :formatter="formatterEnableStatus"
       />
-      <el-table-column
-        prop="sortNum"
-        label="排序"
-      />
-      <el-table-column
-        prop="created"
-        label="创建时间"
-      />
-      <el-table-column
-        prop="modified"
-        label="修改时间"
-      />
-
       <el-table-column
         label="管理"
       >
         <template v-slot="scop">
+          <el-button icon="el-icon-top" @click="moveUp(scop.row.id)" />
+          <el-button icon="el-icon-bottom" @click="moveDown(scop.row.id)" />
           <el-button type="primary" @click="edit(scop.row.id)">编辑</el-button>
           <el-button :disabled="scop.row.isDefault" @click="toggle(scop.row.id)">状态变更</el-button>
           <el-button :disabled="scop.row.isDefault" type="danger" @click="deleteSupplier(scop.row.id)">删除</el-button>
@@ -59,34 +41,17 @@
     >
       <el-form ref="form" :model="formData" :rules="rules" class="form" size="normal" label-width="120px">
 
-        <el-form-item label="主键" prop="id">
-          <el-input v-model="formData.id" placeholder="主键" />
-        </el-form-item>
-
-        <el-form-item label="用户" prop="userId">
-          <el-input v-model="formData.userId" placeholder="用户" />
-        </el-form-item>
-
         <el-form-item label="名称" prop="name">
-          <el-input v-model="formData.name" placeholder="名称" />
+          <el-input v-model="formData.name" placeholder="名称" maxlength="32" show-word-limit />
         </el-form-item>
 
         <el-form-item label="状态" prop="status">
-          <el-input v-model="formData.status" placeholder="状态" />
+          <el-switch
+            v-model="formData.status"
+            active-value="enable"
+            inactive-value="disable"
+          />
         </el-form-item>
-
-        <el-form-item label="排序" prop="sortNum">
-          <el-input v-model="formData.sortNum" placeholder="排序" />
-        </el-form-item>
-
-        <el-form-item label="创建时间" prop="created">
-          <el-input v-model="formData.created" placeholder="创建时间" />
-        </el-form-item>
-
-        <el-form-item label="修改时间" prop="modified">
-          <el-input v-model="formData.modified" placeholder="修改时间" />
-        </el-form-item>
-
         <el-form-item>
           <el-button type="primary" @click="submitData('form')">保存</el-button>
         </el-form-item>
@@ -105,7 +70,20 @@ export default {
     return {
       tableData: null,
       drawer: false,
-      supplier: {}
+      supplier: {},
+      formData: {
+        name: '',
+        status: 'enable'
+      },
+      rules: {
+
+        name: [
+          { required: true, trigger: 'blur', message: '请填写名称' }
+        ],
+        status: [
+          { required: true, trigger: 'blur', message: '请填写状态' }
+        ]
+      }
     }
   },
   mounted() {
@@ -156,11 +134,30 @@ export default {
       } else {
         this.$alert(result.msg, '数据保存失败');
       }
+    },
+    async moveDown(id) {
+      const result = await supplierApi.moveDown(id);
+      if (result.success) {
+        this.loadData();
+      } else {
+        this.$alert(result.msg, '数据保存失败');
+      }
+    },
+    async moveUp(id) {
+      const result = await supplierApi.moveUp(id);
+      if (result.success) {
+        this.loadData();
+      } else {
+        this.$alert(result.msg, '数据保存失败');
+      }
     }
   }
 }
 </script>
 
 <style scoped>
-
+.form{
+  margin: 12px;
+  padding: 12px;
+}
 </style>

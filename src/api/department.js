@@ -24,5 +24,8 @@ export default {
   },
   moveUp(id) {
     return post(`/department/moveup/${id}`)
+  },
+  enableList() {
+    return get('/department/enableList')
   }
 }

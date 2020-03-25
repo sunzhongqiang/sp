@@ -6,7 +6,7 @@
     <el-row>
       <el-form ref="ruleForm" :model="formData" label-position="top" status-icon :rules="rules" label-width="100px" class="address-form">
         <el-form-item prop="address">
-          <el-input v-model="formData.address" type="textarea" :rows="5" maxlength="300" placeholder="粘贴地址信息" />
+          <el-input v-model="formData.address" type="textarea" :rows="5" maxlength="300" placeholder="粘贴地址信息" show-word-limit />
         </el-form-item>
       </el-form>
     </el-row>

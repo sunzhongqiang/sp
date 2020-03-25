@@ -3,7 +3,7 @@
   <div class="app-container">
     <el-form :inline="true" size="mini">
       <el-form-item>
-        <el-button type="primary" icon="el-icon-circle-plus" @click="addModel">添加商品分类 </el-button>
+        <el-button type="primary" icon="el-icon-circle-plus" @click="addModel">添加问题分类 </el-button>
       </el-form-item>
     </el-form>
     <el-table
@@ -12,7 +12,11 @@
     >
 
       <el-table-column
-        prop="name"
+        prop="departmentName"
+        label="所属部门"
+      />
+      <el-table-column
+        prop="title"
         label="分类名称"
       />
       <el-table-column
@@ -20,15 +24,16 @@
         label="状态"
         :formatter="formatterEnableStatus"
       />
+
       <el-table-column
         label="管理"
       >
         <template v-slot="scop">
-          <el-button icon="el-icon-top" @click="moveUp(scop.row.id)" />
-          <el-button icon="el-icon-bottom" @click="moveDown(scop.row.id)" />
-          <el-button type="primary" @click="edit(scop.row.id)">编辑</el-button>
-          <el-button :disabled="scop.row.isDefault" @click="toggle(scop.row.id)">状态变更</el-button>
-          <el-button :disabled="scop.row.isDefault" type="danger" @click="deleteGoodsCategory(scop.row.id)">删除</el-button>
+          <el-button size="small" icon="el-icon-top" @click="moveUp(scop.row.id)" />
+          <el-button size="small" icon="el-icon-bottom" @click="moveDown(scop.row.id)" />
+          <el-button size="small" type="primary" @click="edit(scop.row.id)">编辑</el-button>
+          <el-button size="small" @click="toggle(scop.row.id)">状态变更</el-button>
+          <el-button size="small" type="danger" @click="deleteQuestionCategory(scop.row.id)">删除</el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -41,8 +46,24 @@
     >
       <el-form ref="form" :model="formData" :rules="rules" class="form" size="normal" label-width="120px">
 
-        <el-form-item label="分类名称" prop="name">
-          <el-input v-model="formData.name" placeholder="分类名称" />
+        <el-form-item label="所属部门" prop="departmentId">
+          <el-select v-model="formData.departmentId" placeholder="请选择" @change="showValue">
+            <el-option
+              v-for="item in options"
+              :key="item.id"
+              :label="item.name"
+              :value="item.id"
+            />
+          </el-select>
+        </el-form-item>
+
+        <el-form-item label="分类名称" prop="title">
+          <el-input
+            v-model="formData.title"
+            placeholder="分类名称"
+            maxlength="20"
+            show-word-limit
+          />
         </el-form-item>
 
         <el-form-item label="状态" prop="status">
@@ -63,57 +84,80 @@
 </template>
 
 <script>
-import goodsCategoryApi from '@/api/goodsCategory'
+import questionCategoryApi from '@/api/questionCategory'
 import formatterUtils from '@/mixins/fomatter'
+import departmentApi from '@/api/department'
 export default {
   mixins: [formatterUtils],
   data() {
     return {
       tableData: null,
       drawer: false,
-      goodsCategory: {},
+      questionCategory: {},
+      options: [],
       formData: {
-        name: '',
-        sortNum: '',
-        status: ''
+        id: '',
+        userId: '',
+        departmentId: '',
+        departmentName: '',
+        title: '',
+        status: 'enable',
+        sort: '',
+        created: '',
+        modified: ''
+
       },
       rules: {
-        name: [
+
+        departmentId: [
+          { required: true, trigger: 'blur', message: '请填写所属部门' }
+        ],
+        departmentName: [
+          { required: true, trigger: 'blur', message: '请填写部门名称' }
+        ],
+        title: [
           { required: true, trigger: 'blur', message: '请填写分类名称' }
         ],
         status: [
           { required: true, trigger: 'blur', message: '请填写状态' }
         ]
-
       }
     }
   },
   mounted() {
+    this.loadDepartment();
     this.loadData(0);
   },
   methods: {
-
     addModel() {
       this.drawer = true;
+      this.formData.id = '';
+    },
+    showValue() {
+      console.log('select value', arguments)
+    },
+    async loadDepartment() {
+      const result = await departmentApi.enableList();
+      this.options = result.data.list;
     },
 
     async loadData(page) {
-      const result = await goodsCategoryApi.loadData(page);
+      const result = await questionCategoryApi.loadData(page);
       this.tableData = result.data.content.content;
     },
     async edit(id) {
-      const data = await goodsCategoryApi.find(id);
+      const data = await questionCategoryApi.find(id);
       this.formData = data;
       this.drawer = true;
     },
-    async deleteGoodsCategory(id) {
-      const result = await goodsCategoryApi.delete(id);
+    async deleteQuestionCategory(id) {
+      const result = await questionCategoryApi.delete(id);
       if (result.success) {
         this.loadData();
       }
     },
     async toggle(id) {
-      const result = await goodsCategoryApi.toggle(id);
+      const result = await questionCategoryApi.toggle(id);
       if (result.success) {
         this.loadData();
       }
@@ -129,7 +173,7 @@ export default {
       });
     },
     async saveData() {
-      const result = await goodsCategoryApi.save(this.formData);
+      const result = await questionCategoryApi.save(this.formData);
       if (result.success) {
         this.drawer = false
         this.$alert('数据保存成功');
@@ -139,7 +183,7 @@ export default {
       }
     },
     async moveDown(id) {
-      const result = await goodsCategoryApi.moveDown(id);
+      const result = await questionCategoryApi.moveDown(id);
       if (result.success) {
         this.loadData();
       } else {
@@ -147,7 +191,7 @@ export default {
       }
     },
     async moveUp(id) {
-      const result = await goodsCategoryApi.moveUp(id);
+      const result = await questionCategoryApi.moveUp(id);
       if (result.success) {
         this.loadData();
       } else {
