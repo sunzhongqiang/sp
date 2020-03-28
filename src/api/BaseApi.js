@@ -24,10 +24,10 @@ export default class BaseApi {
   }
 
   post(url, data) {
-    post(url, data)
+    return post(url, data)
   }
 
   get(url, params) {
-    get(url, params)
+    return get(url, params)
   }
 }

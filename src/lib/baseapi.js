@@ -7,7 +7,10 @@ import QS from 'qs'
  */
 export function get(url, params) {
   return request.get(url, {
-    params: params
+    params: params,
+    paramsSerializer: params => {
+      return QS.stringify(params, { arrayFormat: 'indices' })
+    }
   })
 }
 
@@ -26,11 +29,16 @@ export function payload(url, data) {
  * @param {Object} data [请求时携带的参数]
  */
 export function post(url, data) {
-  return request.post(url, QS.stringify(data))
+  return request.post(url, QS.stringify(data, { arrayFormat: 'indices' }))
 }
 /**
  * delete 方法
  */
 export function deleteUrl(url, params) {
-  return request.delete(url, params)
+  return request.delete(url, {
+    param: params,
+    paramsSerializer: params => {
+      return QS.stringify(params, { arrayFormat: 'indices' })
+    }
+  })
 }

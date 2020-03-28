@@ -11,6 +11,12 @@ class QuestionCategoryApi extends BaseApi {
   moveUp(id) {
     return this.post(`/questionCategory/moveup/${id}`)
   }
+  findAllByDepartment(id) {
+    return this.get(`/questionCategory/department/${id}`)
+  }
+  findQuestionWithDepartment() {
+    return this.get('/questionCategory/withDepartment')
+  }
 }
 
 const questionCategoryApi = new QuestionCategoryApi()

@@ -21,5 +21,13 @@ export default {
   },
   toggle(id) {
     return post(`/supplierGoods/toggle/${id}`)
+  },
+
+  getCategorySupplyGoods(categoryId) {
+    return get(`/supplierGoods/category/${categoryId}`)
+  },
+
+  findAllWithCategoryAndSupplier() {
+    return get(`/supplierGoods/withCategoryAndSupplier`)
   }
 }

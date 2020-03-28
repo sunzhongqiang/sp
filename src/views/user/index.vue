@@ -175,7 +175,9 @@ import { validatePassword, equalString, validateTelephone } from '../../utils/va
 import userApi from '@/api/user'
 import subUserApi from '@/api/subUser'
 import moment from 'moment'
+import formatterUtils from '@/mixins/fomatter'
 export default {
+  mixins: [formatterUtils],
   data() {
     const validateRePassword = (rule, value, callback) => {
       if (equalString(value, this.password.newPassword)) {

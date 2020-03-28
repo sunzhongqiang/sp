@@ -2,41 +2,57 @@
 <template>
   <div class="app-container">
     <el-form :inline="true" size="mini">
-
-      <el-form-item label="订单编号">
-        <el-input v-model="queryParams.tradeNo" placeholder="订单编号" />
+      <el-form-item label="所属部门">
+        <el-cascader
+          v-model="formData.departmentId"
+          :options="questionCategoryOptions"
+          :props="{ checkStrictly: true }"
+        />
       </el-form-item>
 
-      <el-form-item label="买家昵称">
-        <el-input v-model="queryParams.buyerNick" placeholder="买家昵称" />
-      </el-form-item>
-
-      <el-form-item label="所属部门主键">
-        <el-input v-model="queryParams.departmentId" placeholder="所属部门主键" />
-      </el-form-item>
-
-      <el-form-item label="问题分类主键">
-        <el-input v-model="queryParams.questionCategoryId" placeholder="问题分类主键" />
-      </el-form-item>
-
-      <el-form-item label="产品分类主键">
-        <el-input v-model="queryParams.goodsCategoryId" placeholder="产品分类主键" />
-      </el-form-item>
-
-      <el-form-item label="产品主键">
-        <el-input v-model="queryParams.goodsId" placeholder="产品主键" />
-      </el-form-item>
-
-      <el-form-item label="产品名称">
-        <el-input v-model="queryParams.goodsName" placeholder="产品名称" />
+      <el-form-item label="产品/供应商">
+        <el-cascader
+          v-model="formData.goodsCategoryId"
+          :options="goodsOption"
+          :props="{ checkStrictly: true }"
+        />
       </el-form-item>
 
       <el-form-item label="处理方式">
-        <el-input v-model="queryParams.disposal" placeholder="处理方式" />
+        <el-select v-model="formData.disposal" placeholder="请选择">
+          <el-option
+            v-for="item in ['退款退货','补发','仅退款','换货']"
+            :key="item"
+            :label="item"
+            :value="item"
+          />
+        </el-select>
       </el-form-item>
 
       <el-form-item label="状态">
-        <el-input v-model="queryParams.status" placeholder="状态" />
+        <el-select v-model="queryParams.status" placeholder="请选择">
+          <el-option
+            v-for="item in ['未处理','已处理']"
+            :key="item"
+            :label="item"
+            :value="item"
+          />
+        </el-select>
+      </el-form-item>
+      <el-form-item label="创建日期">
+        <el-date-picker
+          v-model="createdRange"
+          type="monthrange"
+          placeholder="选择日期"
+        />
+      </el-form-item>
+      <br>
+      <el-form-item label="订单编号">
+        <el-input v-model="queryParams.tradeNo" style="width:450px" placeholder="订单编号" />
+      </el-form-item>
+
+      <el-form-item label="买家昵称">
+        <el-input v-model="queryParams.buyerNick" style="width:180px" placeholder="买家昵称" />
       </el-form-item>
 
       <el-form-item label="创建人">
@@ -45,23 +61,14 @@
 
       <el-form-item name="button">
         <el-button type="primary" @click="query">查询</el-button>
-      </el-form-item>
-      <el-form-item>
         <el-button type="primary" icon="el-icon-circle-plus" @click="addModel">添加售后问题 </el-button>
+        <el-button type="primary" icon="el-icon-circle-plus" @click="exportData">导出</el-button>
       </el-form-item>
     </el-form>
     <el-table
       :data="tableData"
       border
     >
-      <el-table-column
-        prop="tradeNo"
-        label="订单编号"
-      />
-      <el-table-column
-        prop="buyerNick"
-        label="买家昵称"
-      />
       <el-table-column
         prop="departmentName"
         label="部门名称"
@@ -70,6 +77,15 @@
         prop="questionCategoryName"
         label="问题分类"
       />
+      <el-table-column
+        prop="tradeNo"
+        label="订单编号"
+      />
+      <el-table-column
+        prop="buyerNick"
+        label="买家昵称"
+      />
+
       <el-table-column
         prop="goodsCategoryName"
         label="产品分类"
@@ -105,60 +121,75 @@
       <el-table-column
         prop="created"
         label="创建时间"
+        :formatter="formatterDate"
       />
       <el-table-column
         label="管理"
       >
         <template v-slot="scop">
-          <el-button type="primary" @click="edit(scop.row.id)">编辑</el-button>
-          <el-button :disabled="scop.row.isDefault" @click="toggle(scop.row.id)">状态变更</el-button>
-          <el-button :disabled="scop.row.isDefault" type="danger" @click="deleteAfterSaleQuestion(scop.row.id)">删除</el-button>
+          <el-link @click="edit(scop.row.id)">编辑</el-link>
         </template>
       </el-table-column>
+      <template v-slot:append>
+        <div class="pagination">
+          <el-pagination
+            background
+            layout="prev, pager, next"
+            :total="total"
+            :page-size="10"
+          />
+        </div>
+      </template>
     </el-table>
 
     <el-drawer
       title="添加"
       :visible.sync="drawer"
       :with-header="false"
-      size="600px"
+      size="800px"
     >
       <el-form ref="form" :model="formData" :rules="rules" class="form" size="normal" label-width="120px">
 
         <el-form-item label="订单编号" prop="tradeNo">
-          <el-input v-model="formData.tradeNo" placeholder="订单编号" />
+          <el-input v-model="formData.tradeNo" placeholder="订单编号" maxlength="32" show-word-limit />
         </el-form-item>
 
         <el-form-item label="买家昵称" prop="buyerNick">
-          <el-input v-model="formData.buyerNick" placeholder="买家昵称" />
+          <el-input v-model="formData.buyerNick" placeholder="买家昵称" maxlength="32" show-word-limit />
         </el-form-item>
 
-        <el-form-item label="订单金额" prop="total">
-          <el-input v-model="formData.total" placeholder="订单金额" />
+        <el-row>
+          <el-col :span="12">
+            <el-form-item label="订单金额" prop="total">
+              <el-input-number v-model="formData.total" placeholder="请输入订单金额" />
+            </el-form-item>
+          </el-col>
+          <el-col :span="12">
+            <el-form-item label="退款金额" prop="refundMoney">
+              <el-input-number v-model="formData.refundMoney" placeholder="请输入退款金额" />
+            </el-form-item>
+          </el-col>
+        </el-row>
+
+        <el-form-item label="部门和问题分类" prop="departmentAndQuestion">
+          <el-cascader-panel v-model="formData.departmentAndQuestion" :options="questionCategoryOptions" @change="departmentChange" />
         </el-form-item>
 
-        <el-form-item label="退款金额" prop="refundMoney">
-          <el-input v-model="formData.refundMoney" placeholder="退款金额" />
-        </el-form-item>
-
-        <el-form-item label="部门名称" prop="departmentName">
-          <el-input v-model="formData.departmentName" placeholder="部门名称" />
-        </el-form-item>
-
-        <el-form-item label="问题分类名称" prop="questionCategoryName">
-          <el-input v-model="formData.questionCategoryName" placeholder="问题分类名称" />
-        </el-form-item>
-
-        <el-form-item label="所属产品名称" prop="goodsCategoryName">
-          <el-input v-model="formData.goodsCategoryName" placeholder="所属产品名称" />
+        <el-form-item label="商品和代理商" prop="goodsOption">
+          <el-cascader-panel v-model="formData.goodsOption" :options="goodsOption" @change="goodsChange" />
         </el-form-item>
 
         <el-form-item label="问题描述" prop="description">
-          <el-input v-model="formData.description" placeholder="问题描述" />
+          <el-input v-model="formData.description" type="textarea" :rows="3" placeholder="请输入内容" maxlength="1000" show-word-limit />
         </el-form-item>
 
         <el-form-item label="处理方式" prop="disposal">
-          <el-input v-model="formData.disposal" placeholder="处理方式" />
+          <el-radio-group v-model="formData.disposal" size="medium">
+            <el-radio-button label="退款退货" />
+            <el-radio-button label="补发" />
+            <el-radio-button label="仅退款" />
+            <el-radio-button label="换货" />
+          </el-radio-group>
         </el-form-item>
 
         <el-form-item>
@@ -172,14 +203,26 @@
 
 <script>
 import afterSaleQuestionApi from '@/api/AfterSaleQuestionApi'
+import questionCategoryApi from '@/api/questionCategory'
+import supplierGoodsApi from '@/api/supplierGoods'
+import departmentApi from '@/api/department'
 import formatterUtils from '@/mixins/fomatter'
+import ExportExcel from '@/lib/ExportExcel'
+import moment from 'moment';
 export default {
   mixins: [formatterUtils],
   data() {
     return {
       tableData: null,
       drawer: false,
+      total: 0,
+      departmentList: [],
+      departmentOptions: [],
+      questionCategoryOptions: [],
+      questionOptions: [],
+      goodsOption: [],
       afterSaleQuestion: {},
+      createdRange: [],
       formData: {
         id: '',
         userId: '',
@@ -200,11 +243,12 @@ export default {
         subUserId: '',
         subUserName: '',
         created: '',
-        modified: ''
+        modified: '',
+        departmentAndQuestion: [],
+        goodsOption: []
       },
       queryParams: {},
       rules: {
-
         tradeNo: [
           { required: true, trigger: 'blur', message: '请填写订单编号' }
         ],
@@ -212,16 +256,24 @@ export default {
           { required: true, trigger: 'blur', message: '请填写买家昵称' }
         ],
         total: [
-          { required: true, trigger: 'blur', message: '请填写订单金额' }
+          { required: true, trigger: 'blur', message: '请填写订单金额' },
+          { type: 'number', trigger: 'blur', message: '请检查数据类型是否为数字' }
         ],
         refundMoney: [
-          { required: true, trigger: 'blur', message: '请填写退款金额' }
+          { required: true, trigger: 'blur', message: '请填写退款金额' },
+          { type: 'number', trigger: 'blur', message: '请检查数据类型是否为数字' }
         ],
-        departmentId: [
-          { required: true, trigger: 'blur', message: '请填写所属部门主键' }
+        departmentAndQuestion: [
+          { type: 'array', required: true, trigger: 'blur', message: '请选择部门' }
+        ],
+        goodsOption: [
+          { type: 'array', required: true, trigger: 'blur', message: '请选择部门' }
         ],
         questionCategoryId: [
-          { required: true, trigger: 'blur', message: '请填写问题分类' }
+          { required: true, trigger: 'blur', message: '请选择问题分类' }
+        ],
+        supplierId: [
+          { required: true, trigger: 'blur', message: '请选择供应商' }
         ],
         goodsCategoryId: [
           { required: true, trigger: 'blur', message: '请填写所属产品' }
@@ -240,9 +292,18 @@ export default {
   },
   mounted() {
     this.loadData(0);
+    this.loadQuesion();
+    this.loadGoodsOption();
   },
   methods: {
-
+    async loadGoodsOption() {
+      const result = await supplierGoodsApi.findAllWithCategoryAndSupplier();
+      this.goodsOption = result.data.list;
+    },
+    async loadQuesion() {
+      const result = await questionCategoryApi.findQuestionWithDepartment();
+      this.questionCategoryOptions = result.data.list;
+    },
     addModel() {
       this.drawer = true;
     },
@@ -250,11 +311,19 @@ export default {
     async loadData(page) {
       const result = await afterSaleQuestionApi.loadData(page);
       this.tableData = result.data.content.content;
+      this.total = result.data.content.totalElements
+      const departmentList = await departmentApi.enableList();
+      this.departmentList = departmentList.data.list;
+      const questionCategoryList = questionCategoryApi.enableList();
+      this.questionOptions = questionCategoryList.data.list;
     },
     async edit(id) {
       const data = await afterSaleQuestionApi.find(id);
       this.formData = data;
+      this.formData.departmentAndQuestion = [data.departmentId, data.questionCategoryId]
+      this.formData.goodsOption = [data.goodsCategoryId, data.goodsId, data.supplierId]
       this.drawer = true;
+      console.log('formdata', this.formData);
     },
     async deleteAfterSaleQuestion(id) {
       const result = await afterSaleQuestionApi.delete(id);
@@ -287,6 +356,31 @@ export default {
       } else {
         this.$alert(result.msg, '数据保存失败');
       }
+    },
+    departmentChange(value) {
+      this.formData.departmentId = value[0]
+      this.formData.questionCategoryId = value[1]
+    },
+    goodsChange(value) {
+      this.formData.goodsCategoryId = value[0]
+      this.formData.goodsId = value[1]
+      this.formData.supplierId = value[2]
+      console.log('this.formData', this.formData)
+    },
+    async query(page) {
+      if (!page) {
+        page = 0;
+      }
+      this.queryParams.page = page;
+      this.queryParams.createdRange = [];
+      this.queryParams.createdRange[0] = moment(this.createdRange[0]).format('YYYY-MM-DD HH:mm:ss');
+      this.queryParams.createdRange[1] = moment(this.createdRange[1]).format('YYYY-MM-DD HH:mm:ss');
+      const result = await afterSaleQuestionApi.query(this.queryParams);
+      this.tableData = result.data.content.content;
+    },
+    exportData() {
+      console.log('export data', this.tableData)
+      new ExportExcel().exportExcel(this.tableData, 'test.xlsx')
     }
   }
 }
@@ -295,6 +389,11 @@ export default {
 <style scoped>
 .form{
   margin: 12px;
+  padding: 12px;
+}
+.pagination{
+  display: flex;
+  justify-content: flex-end;
   padding: 12px;
 }
 </style>

@@ -27,5 +27,8 @@ export default {
   },
   enableList() {
     return get(`/supplier/enableList`)
+  },
+  findByGoodsId(goodsId) {
+    return get(`/supplier/findByGoodsId/${goodsId}`)
   }
 }

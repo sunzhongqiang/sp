@@ -15,7 +15,7 @@
               首页
             </el-dropdown-item>
           </router-link>
-          <router-link to="/nested/user">
+          <router-link to="/setting/user">
             <el-dropdown-item>
               用户信息
             </el-dropdown-item>
