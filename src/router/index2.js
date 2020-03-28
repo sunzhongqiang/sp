@@ -73,27 +73,27 @@ export const constantRoutes = [
     }]
   },
 
-  // {
-  //   path: '/trade',
-  //   component: Layout,
-  //   redirect: '/trade/table',
-  //   name: 'trade',
-  //   meta: { title: '订单打印', icon: 'table' },
-  //   children: [
-  //     {
-  //       path: 'table',
-  //       name: 'trade-print',
-  //       component: () => import('@/views/table/index'),
-  //       meta: { title: '订单打印' }
-  //     },
-  //     {
-  //       path: 'free',
-  //       name: 'free-print',
-  //       component: () => import('@/views/freeprint/index'),
-  //       meta: { title: '自由打印' }
-  //     }
-  //   ]
-  // },
+  {
+    path: '/trade',
+    component: Layout,
+    redirect: '/trade/table',
+    name: 'trade',
+    meta: { title: '订单打印', icon: 'table' },
+    children: [
+      {
+        path: 'table',
+        name: 'trade-print',
+        component: () => import('@/views/table/index'),
+        meta: { title: '订单打印' }
+      },
+      {
+        path: 'free',
+        name: 'free-print',
+        component: () => import('@/views/freeprint/index'),
+        meta: { title: '自由打印' }
+      }
+    ]
+  },
   {
     path: '/aftersale',
     component: Layout,
@@ -123,11 +123,6 @@ export const constantRoutes = [
     meta: { title: '供应管理', icon: 'table' },
     children: [
       {
-        path: 'goodsCategory',
-        component: () => import('@/views/category'),
-        meta: { title: '商品分类' }
-      },
-      {
         path: 'supplier',
         component: () => import('@/views/supplier'),
         meta: { title: '供应商' }
@@ -143,29 +138,34 @@ export const constantRoutes = [
     path: '/setting',
     component: Layout,
     redirect: '/setting/printbill',
-    name: 'Setting',
+    name: 'Nested',
     meta: {
       title: '设置',
-      icon: 'user'
+      icon: 'nested'
     },
     children: [
-      // {
-      //   path: 'printbill',
-      //   component: () => import('@/views/print'), // Parent router-view
-      //   name: 'printbill',
-      //   meta: { title: '电子面单' }
-      // },
-      // {
-      //   path: 'shop',
-      //   component: () => import('@/views/shop'),
-      //   meta: { title: '店铺管理' }
-      // },
-      // {
-      //   path: 'sender',
-      //   component: () => import('@/views/sender'),
-      //   meta: { title: '地址管理' }
-      // },
+      {
+        path: 'printbill',
+        component: () => import('@/views/print'), // Parent router-view
+        name: 'printbill',
+        meta: { title: '电子面单' }
+      },
+      {
+        path: 'shop',
+        component: () => import('@/views/shop'),
+        meta: { title: '店铺管理' }
+      },
+      {
+        path: 'sender',
+        component: () => import('@/views/sender'),
+        meta: { title: '地址管理' }
+      },
 
+      {
+        path: 'goodsCategory',
+        component: () => import('@/views/category'),
+        meta: { title: '商品分类' }
+      },
       {
         path: 'department',
         component: () => import('@/views/department'),

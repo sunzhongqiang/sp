@@ -64,6 +64,7 @@
 
       <el-table-column
         label="管理"
+        width="360px"
       >
         <template v-slot="scop">
           <el-button size="small" icon="el-icon-top" @click="moveUp(scop.row.id)" />

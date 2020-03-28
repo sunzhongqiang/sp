@@ -23,13 +23,14 @@
       />
       <el-table-column
         label="管理"
+        width="360px"
       >
         <template v-slot="scop">
-          <el-button icon="el-icon-top" @click="moveUp(scop.row.id)" />
-          <el-button icon="el-icon-bottom" @click="moveDown(scop.row.id)" />
-          <el-button type="primary" @click="edit(scop.row.id)">编辑</el-button>
-          <el-button :disabled="scop.row.isDefault" @click="toggle(scop.row.id)">状态变更</el-button>
-          <el-button :disabled="scop.row.isDefault" type="danger" @click="deleteDepartment(scop.row.id)">删除</el-button>
+          <el-button size="small" icon="el-icon-top" @click="moveUp(scop.row.id)" />
+          <el-button size="small" icon="el-icon-bottom" @click="moveDown(scop.row.id)" />
+          <el-button size="small" type="primary" @click="edit(scop.row.id)">编辑</el-button>
+          <el-button size="small" :disabled="scop.row.isDefault" @click="toggle(scop.row.id)">状态变更</el-button>
+          <el-button size="small" :disabled="scop.row.isDefault" type="danger" @click="deleteDepartment(scop.row.id)">删除</el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -106,6 +107,7 @@ export default {
   methods: {
     addDepartment() {
       this.drawer = true;
+      this.formData = {};
     },
     async loadData(page) {
       const result = await departmentApi.loadData(page);

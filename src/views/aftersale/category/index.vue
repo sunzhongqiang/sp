@@ -27,6 +27,7 @@
 
       <el-table-column
         label="管理"
+        width="360px"
       >
         <template v-slot="scop">
           <el-button size="small" icon="el-icon-top" @click="moveUp(scop.row.id)" />
@@ -131,7 +132,7 @@ export default {
   methods: {
     addModel() {
       this.drawer = true;
-      this.formData.id = '';
+      this.formData = {};
     },
     showValue() {
       console.log('select value', arguments)

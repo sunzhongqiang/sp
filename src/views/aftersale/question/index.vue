@@ -4,22 +4,24 @@
     <el-form :inline="true" size="mini">
       <el-form-item label="所属部门">
         <el-cascader
-          v-model="formData.departmentId"
+          v-model="queryParams.department"
           :options="questionCategoryOptions"
           :props="{ checkStrictly: true }"
+          @change="queryDepartmentChange"
         />
       </el-form-item>
 
       <el-form-item label="产品/供应商">
         <el-cascader
-          v-model="formData.goodsCategoryId"
+          v-model="queryParams.goodsCategory"
           :options="goodsOption"
           :props="{ checkStrictly: true }"
+          @change="queryGoodsChange"
         />
       </el-form-item>
 
       <el-form-item label="处理方式">
-        <el-select v-model="formData.disposal" placeholder="请选择">
+        <el-select v-model="queryParams.disposal" placeholder="请选择">
           <el-option
             v-for="item in ['退款退货','补发','仅退款','换货']"
             :key="item"
@@ -41,8 +43,8 @@
       </el-form-item>
       <el-form-item label="创建日期">
         <el-date-picker
-          v-model="createdRange"
-          type="monthrange"
+          v-model="queryParams.createdRange"
+          type="daterange"
           placeholder="选择日期"
         />
       </el-form-item>
@@ -60,9 +62,9 @@
       </el-form-item>
 
       <el-form-item name="button">
-        <el-button type="primary" @click="query">查询</el-button>
+        <el-button type="primary" icon="el-icon-search" @click="query">查询</el-button>
+        <el-button type="primary" icon="el-icon-download" @click="exportData">导出</el-button>
         <el-button type="primary" icon="el-icon-circle-plus" @click="addModel">添加售后问题 </el-button>
-        <el-button type="primary" icon="el-icon-circle-plus" @click="exportData">导出</el-button>
       </el-form-item>
     </el-form>
     <el-table
@@ -77,10 +79,7 @@
         prop="questionCategoryName"
         label="问题分类"
       />
-      <el-table-column
-        prop="tradeNo"
-        label="订单编号"
-      />
+
       <el-table-column
         prop="buyerNick"
         label="买家昵称"
@@ -95,8 +94,13 @@
         label="产品名称"
       />
       <el-table-column
-        prop="description"
-        label="问题描述"
+        prop="supplierName"
+        label="供应商"
+      />
+
+      <el-table-column
+        prop="tradeNo"
+        label="订单编号"
       />
       <el-table-column
         prop="total"
@@ -105,6 +109,10 @@
       <el-table-column
         prop="refundMoney"
         label="退款金额"
+      />
+      <el-table-column
+        prop="description"
+        label="问题描述"
       />
       <el-table-column
         prop="disposal"
@@ -222,7 +230,6 @@ export default {
       questionOptions: [],
       goodsOption: [],
       afterSaleQuestion: {},
-      createdRange: [],
       formData: {
         id: '',
         userId: '',
@@ -306,6 +313,7 @@ export default {
     },
     addModel() {
       this.drawer = true;
+      this.formData = {};
     },
 
     async loadData(page) {
@@ -338,7 +346,6 @@ export default {
       }
     },
     submitData(formName) {
-      console.log(this.formData);
       this.$refs[formName].validate((valid, error) => {
         if (valid) {
           this.saveData();
@@ -365,22 +372,58 @@ export default {
       this.formData.goodsCategoryId = value[0]
       this.formData.goodsId = value[1]
       this.formData.supplierId = value[2]
-      console.log('this.formData', this.formData)
+    },
+    queryDepartmentChange(value) {
+      this.queryParams.departmentId = value[0]
+      value.length > 1 ? this.queryParams.questionCategoryId = value[1] : '';
+    },
+    queryGoodsChange(value) {
+      this.queryParams.goodsCategoryId = value[0]
+      value.length > 1 ? this.queryParams.goodsId = value[1] : '';
+      value.length > 2 ? this.queryParams.supplierId = value[2] : '';
     },
     async query(page) {
       if (!page) {
         page = 0;
       }
       this.queryParams.page = page;
-      this.queryParams.createdRange = [];
-      this.queryParams.createdRange[0] = moment(this.createdRange[0]).format('YYYY-MM-DD HH:mm:ss');
-      this.queryParams.createdRange[1] = moment(this.createdRange[1]).format('YYYY-MM-DD HH:mm:ss');
+      if (this.queryParams.createdRange && this.queryParams.createdRange.length === 2) {
+        this.queryParams.createdRange[0] = moment(this.queryParams.createdRange[0]).format('YYYY-MM-DD');
+        this.queryParams.createdRange[1] = moment(this.queryParams.createdRange[1]).format('YYYY-MM-DD');
+      }
+      console.log('queryParams', this.queryParams)
       const result = await afterSaleQuestionApi.query(this.queryParams);
       this.tableData = result.data.content.content;
     },
-    exportData() {
-      console.log('export data', this.tableData)
-      new ExportExcel().exportExcel(this.tableData, 'test.xlsx')
+    async exportData() {
+      if (this.queryParams.createdRange && this.queryParams.createdRange.length === 2) {
+        this.queryParams.createdRange[0] = moment(this.queryParams.createdRange[0]).format('YYYY-MM-DD');
+        this.queryParams.createdRange[1] = moment(this.queryParams.createdRange[1]).format('YYYY-MM-DD');
+      } else {
+        this.$alert('导出时请务必选择日期防止导出的数据过大', '提示')
+        return;
+      }
+      const result = await afterSaleQuestionApi.query(this.queryParams);
+      const data = result.data.content.content;
+      const exportData = [];
+      for (const item of data) {
+        exportData.push({
+          '部门': item.departmentName,
+          '问题类型': item.questionCategoryName,
+          '商品分类': item.goodsCategoryName,
+          '商品名称': item.goodsName,
+          '供应商': item.supplierName,
+          '订单编号': item.tradeNo,
+          '订单金额': item.total,
+          '退款金额': item.refundMoney,
+          '问题': item.description,
+          '处理方式': item.disposal,
+          '登记时间': moment(item.created).format('YYYY-MM-DD'),
+          '登记人': item.subUserName
+        })
+      }
+      this.queryParams.pageSize = 1000;
+      new ExportExcel().exportExcel(exportData, moment(this.queryParams.createdRange[0]).format('YYYY-MM-DD') + '.xlsx')
     }
   }
 }
