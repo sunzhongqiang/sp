@@ -7,6 +7,7 @@
           v-model="queryParams.department"
           :options="questionCategoryOptions"
           :props="{ checkStrictly: true }"
+          :clearable="true"
           @change="queryDepartmentChange"
         />
       </el-form-item>
@@ -16,49 +17,51 @@
           v-model="queryParams.goodsCategory"
           :options="goodsOption"
           :props="{ checkStrictly: true }"
+          :clearable="true"
           @change="queryGoodsChange"
         />
       </el-form-item>
 
       <el-form-item label="处理方式">
-        <el-select v-model="queryParams.disposal" placeholder="请选择">
+        <el-select v-model="queryParams.disposal" placeholder="请选择" :clearable="true">
           <el-option
-            v-for="item in ['退款退货','补发','仅退款','换货']"
-            :key="item"
-            :label="item"
-            :value="item"
+            v-for="item in [{label:'全部',value:''},{label:'退款退货',value:'退款退货'},{label:'补发',value:'补发'},{label:'仅退款',value:'仅退款'},{label:'换货',value:'换货'}]"
+            :key="item.label"
+            :label="item.label"
+            :value="item.value"
           />
         </el-select>
       </el-form-item>
 
       <el-form-item label="状态">
-        <el-select v-model="queryParams.status" placeholder="请选择">
+        <el-select v-model="queryParams.status" placeholder="请选择" :clearable="true">
           <el-option
-            v-for="item in ['未处理','已处理']"
-            :key="item"
-            :label="item"
-            :value="item"
+            v-for="item in [{label:'全部',value:''},{label:'未处理',value:'未处理'},{label:'已处理',value:'已处理'}]"
+            :key="item.label"
+            :label="item.label"
+            :value="item.value"
           />
         </el-select>
       </el-form-item>
       <el-form-item label="创建日期">
         <el-date-picker
           v-model="queryParams.createdRange"
+          :clearable="true"
           type="daterange"
           placeholder="选择日期"
         />
       </el-form-item>
       <br>
       <el-form-item label="订单编号">
-        <el-input v-model="queryParams.tradeNo" style="width:450px" placeholder="订单编号" />
+        <el-input v-model="queryParams.tradeNo" style="width:450px" placeholder="订单编号" :clearable="true" />
       </el-form-item>
 
       <el-form-item label="买家昵称">
-        <el-input v-model="queryParams.buyerNick" style="width:180px" placeholder="买家昵称" />
+        <el-input v-model="queryParams.buyerNick" style="width:180px" placeholder="买家昵称" :clearable="true" />
       </el-form-item>
 
       <el-form-item label="创建人">
-        <el-input v-model="queryParams.subUserName" placeholder="创建人" />
+        <el-input v-model="queryParams.subUserName" placeholder="创建人" :clearable="true" />
       </el-form-item>
 
       <el-form-item name="button">
@@ -81,11 +84,6 @@
       />
 
       <el-table-column
-        prop="buyerNick"
-        label="买家昵称"
-      />
-
-      <el-table-column
         prop="goodsCategoryName"
         label="产品分类"
       />
@@ -96,6 +94,11 @@
       <el-table-column
         prop="supplierName"
         label="供应商"
+      />
+
+      <el-table-column
+        prop="buyerNick"
+        label="买家昵称"
       />
 
       <el-table-column
@@ -213,7 +216,6 @@
 import afterSaleQuestionApi from '@/api/AfterSaleQuestionApi'
 import questionCategoryApi from '@/api/questionCategory'
 import supplierGoodsApi from '@/api/supplierGoods'
-import departmentApi from '@/api/department'
 import formatterUtils from '@/mixins/fomatter'
 import ExportExcel from '@/lib/ExportExcel'
 import moment from 'moment';
@@ -231,28 +233,7 @@ export default {
       goodsOption: [],
       afterSaleQuestion: {},
       formData: {
-        id: '',
-        userId: '',
-        tradeNo: '',
-        buyerNick: '',
-        total: '',
-        refundMoney: '',
-        departmentId: '',
-        departmentName: '',
-        questionCategoryId: '',
-        questionCategoryName: '',
-        goodsCategoryId: '',
-        goodsCategoryName: '',
-        description: '',
-        disposal: '',
-        status: '',
-        sortNum: '',
-        subUserId: '',
-        subUserName: '',
-        created: '',
-        modified: '',
-        departmentAndQuestion: [],
-        goodsOption: []
+
       },
       queryParams: {},
       rules: {
@@ -320,10 +301,6 @@ export default {
       const result = await afterSaleQuestionApi.loadData(page);
       this.tableData = result.data.content.content;
       this.total = result.data.content.totalElements
-      const departmentList = await departmentApi.enableList();
-      this.departmentList = departmentList.data.list;
-      const questionCategoryList = questionCategoryApi.enableList();
-      this.questionOptions = questionCategoryList.data.list;
     },
     async edit(id) {
       const data = await afterSaleQuestionApi.find(id);

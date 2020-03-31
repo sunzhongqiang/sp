@@ -144,11 +144,12 @@ export const constantRoutes = [
       icon: 'nested'
     },
     children: [
+
       {
-        path: 'printbill',
-        component: () => import('@/views/print'), // Parent router-view
+        path: 'printtemplate',
+        component: () => import('@/views/print-template'), // Parent router-view
         name: 'printbill',
-        meta: { title: '电子面单' }
+        meta: { title: '打印模版' }
       },
       {
         path: 'shop',
