@@ -3,6 +3,7 @@
     <el-form :inline="true" size="mini">
       <el-form-item>
         <el-button type="primary" icon="el-icon-circle-plus" @click="showPlatform">绑定新店铺</el-button>
+        <el-button type="primary" icon="el-icon-circle-plus" @click="addModel">手动添加店铺 </el-button>
       </el-form-item>
     </el-form>
     <el-table
@@ -38,8 +39,8 @@
         label="管理"
       >
         <template v-slot="scope">
-          <el-button type="info" @click="refreshToken()">刷新授权</el-button>
-          <el-button type="primary" @click="showDetail(scope.row.id)">详情</el-button>
+          <el-button size="small" type="info" @click="refreshToken()">刷新授权</el-button>
+          <el-button size="small" type="primary" @click="showDetail(scope.row.id)">详情</el-button>
         </template>
       </el-table-column>
       <template v-slot:append>
@@ -48,7 +49,8 @@
             background
             layout="prev, pager, next"
             :total="total"
-            :page-size="10"
+            :page-size="20"
+            @current-change="loadPage"
           />
         </div>
       </template>
@@ -109,6 +111,35 @@
       </el-row>
 
     </el-drawer>
+    <el-drawer
+      title="添加"
+      :visible.sync="fromDrawer"
+      :with-header="false"
+      size="600px"
+    >
+      <el-form ref="form" :model="formData" :rules="rules" class="form" size="normal" label-width="120px">
+        <el-form-item label="店铺名称" prop="mallName">
+          <el-input v-model="formData.mallName" placeholder="店铺名称" />
+        </el-form-item>
+        <el-form-item label="平台渠道" prop="platform">
+          <el-select v-model="formData.platform" placeholder="请选择">
+            <el-option
+              v-for="item in channel"
+              :key="item.value"
+              :label="item.label"
+              :value="item.value"
+            />
+          </el-select>
+        </el-form-item>
+
+        <el-form-item label="店铺描述" prop="mallDesc">
+          <el-input v-model="formData.mallDesc" type="textarea" :rows="3" placeholder="请输入内容" maxlength="30" show-word-limit />
+        </el-form-item>
+        <el-form-item>
+          <el-button type="primary" @click="submitData('form')">保存</el-button>
+        </el-form-item>
+      </el-form>
+    </el-drawer>
   </div>
 
 </template>
@@ -118,32 +149,62 @@ import formatterMixin from '@/mixins/fomatter'
 import moment from 'moment'
 export default {
   mixins: [formatterMixin],
-
   data() {
     const token = this.$store.state.user.id
-    const authShopUrl = `https://mms.pinduoduo.com/open.html?response_type=code&client_id=689c4a30f65749168e6e2c9b1b0e438c&redirect_uri=http://192.168.0.131:8080/pdd/callback&state=${token}`
+    const authShopUrl = `https://mms.pinduoduo.com/open.html?response_type=code&client_id=689c4a30f65749168e6e2c9b1b0e438c&redirect_uri=http://192.168.0.1:8080/pdd/callback&state=${token}`
     return {
       shopDetailDrawer: false,
       plateformDrawer: false,
+      fromDrawer: false,
+      formData: {},
       tableData: null,
       authShop: authShopUrl,
       shop: {},
-      total: 0
+      total: 0,
+      channel: [
+        { value: 'TAOBAO', label: '淘宝' },
+        { value: 'TMALL', label: '天猫' },
+        { value: 'JD', label: '京东' },
+        { value: 'PDD', label: '拼多多' },
+        { value: 'WD', label: '微店' },
+        { value: 'REALSHOP', label: '线下实体店' }
+      ],
+      rules: {
+
+        mallDesc: [
+          { required: true, trigger: 'blur', message: '请填写店铺描述' }
+        ],
+        mallName: [
+          { required: true, trigger: 'blur', message: '请填写店铺名称' }
+        ],
+        merchantType: [
+          { required: true, trigger: 'blur', message: '请填写店铺类型' }
+        ],
+        platform: [
+          { required: true, trigger: 'blur', message: '请填写平台类型' }
+        ]
+      }
     }
   },
   mounted() {
     this.loadData();
   },
   methods: {
+    addModel() {
+      this.fromDrawer = true;
+    },
     showPlatform() {
       this.plateformDrawer = true;
     },
-    async loadData() {
-      const result = await shopApi.list(0);
+    async loadData(page) {
+      const result = await shopApi.loadData(page);
       if (result.success) {
         this.tableData = result.data.content.content;
         this.total = result.data.totalElements
       }
+    },
+    loadPage(page) {
+      this.loadData(page - 1);
     },
     async showDetail(id) {
       const shop = await shopApi.find(id);
@@ -157,6 +218,26 @@ export default {
     },
     refreshToken() {
       window.location.href = this.authShop;
+    },
+    submitData(formName) {
+      console.log(this.formData);
+      this.$refs[formName].validate((valid, error) => {
+        if (valid) {
+          this.saveData();
+        } else {
+          this.$alert('表单中含有错误信息，请检查', '警告');
+        }
+      });
+    },
+    async saveData() {
+      const result = await shopApi.save(this.formData);
+      if (result.success) {
+        this.drawer = false
+        this.$alert('数据保存成功');
+        this.loadData();
+      } else {
+        this.$alert(result.msg, '数据保存失败');
+      }
     }
   }
 }
@@ -170,5 +251,14 @@ export default {
 .shop-info{
   padding: 12px;
   color: #666;
+}
+.form{
+  margin: 12px;
+  padding: 12px;
+}
+.pagination{
+  display: flex;
+  justify-content: flex-end;
+  padding: 12px;
 }
 </style>

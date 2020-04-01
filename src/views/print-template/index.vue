@@ -43,7 +43,7 @@ export default {
   },
   methods: {
     async loadShopList() {
-      const shopList = await shopApi.list();
+      const shopList = await shopApi.loadData();
       this.shopList = shopList.data.content.content;
       console.log('shopList', this.shopList)
     },

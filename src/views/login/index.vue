@@ -94,8 +94,8 @@ export default {
       captcha: 'data:image/jpg;base64,',
       isSubUser: true,
       loginForm: {
-        username: '18669996211',
-        password: '123456',
+        username: '',
+        password: '',
         captcha: ''
       },
       loginRules: {

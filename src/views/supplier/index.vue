@@ -32,6 +32,17 @@
           <el-button size="small" type="danger" @click="deleteQuestionCategory(scop.row.id)">删除</el-button>
         </template>
       </el-table-column>
+      <template v-slot:append>
+        <div class="pagination">
+          <el-pagination
+            background
+            layout="prev, pager, next"
+            :total="total"
+            :page-size="20"
+            @current-change="loadPage"
+          />
+        </div>
+      </template>
     </el-table>
 
     <el-drawer
@@ -102,6 +113,10 @@ export default {
     async loadData(page) {
       const result = await supplierApi.loadData(page);
       this.tableData = result.data.content.content;
+      this.total = result.data.content.totalElements
+    },
+    loadPage(page) {
+      this.loadData(page - 1);
     },
     async edit(id) {
       const data = await supplierApi.find(id);
@@ -162,6 +177,11 @@ export default {
 <style scoped>
 .form{
   margin: 12px;
+  padding: 12px;
+}
+.pagination{
+  display: flex;
+  justify-content: flex-end;
   padding: 12px;
 }
 </style>

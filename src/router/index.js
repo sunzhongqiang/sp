@@ -155,11 +155,11 @@ export const constantRoutes = [
       //   name: 'printbill',
       //   meta: { title: '电子面单' }
       // },
-      // {
-      //   path: 'shop',
-      //   component: () => import('@/views/shop'),
-      //   meta: { title: '店铺管理' }
-      // },
+      {
+        path: 'shop',
+        component: () => import('@/views/shop'),
+        meta: { title: '店铺管理' }
+      },
       // {
       //   path: 'sender',
       //   component: () => import('@/views/sender'),

@@ -147,7 +147,8 @@
             background
             layout="prev, pager, next"
             :total="total"
-            :page-size="10"
+            :page-size="20"
+            @current-change="loadPage"
           />
         </div>
       </template>
@@ -161,6 +162,16 @@
     >
       <el-form ref="form" :model="formData" :rules="rules" class="form" size="normal" label-width="120px">
 
+        <el-form-item label="选择店铺" prop="shopId">
+          <el-select v-model="formData.shopId" placeholder="请选择店铺">
+            <el-option
+              v-for="item in shopOptions"
+              :key="item.id"
+              :label="item.mallName"
+              :value="item.id"
+            />
+          </el-select>
+        </el-form-item>
         <el-form-item label="订单编号" prop="tradeNo">
           <el-input v-model="formData.tradeNo" placeholder="订单编号" maxlength="32" show-word-limit />
         </el-form-item>
@@ -216,6 +227,7 @@
 import afterSaleQuestionApi from '@/api/AfterSaleQuestionApi'
 import questionCategoryApi from '@/api/questionCategory'
 import supplierGoodsApi from '@/api/supplierGoods'
+import shopApi from '@/api/shop'
 import formatterUtils from '@/mixins/fomatter'
 import ExportExcel from '@/lib/ExportExcel'
 import moment from 'moment';
@@ -232,11 +244,15 @@ export default {
       questionOptions: [],
       goodsOption: [],
       afterSaleQuestion: {},
+      shopOptions: [],
       formData: {
 
       },
       queryParams: {},
       rules: {
+        shopId: [
+          { required: true, trigger: 'blur', message: '请选择店铺' }
+        ],
         tradeNo: [
           { required: true, trigger: 'blur', message: '请填写订单编号' }
         ],
@@ -282,11 +298,16 @@ export default {
     this.loadData(0);
     this.loadQuesion();
     this.loadGoodsOption();
+    this.loadShopOptions();
   },
   methods: {
     async loadGoodsOption() {
       const result = await supplierGoodsApi.findAllWithCategoryAndSupplier();
       this.goodsOption = result.data.list;
+    },
+    async loadShopOptions() {
+      const result = await shopApi.query({ pageSize: 100 });
+      this.shopOptions = result.data.content.content;
     },
     async loadQuesion() {
       const result = await questionCategoryApi.findQuestionWithDepartment();
@@ -301,6 +322,9 @@ export default {
       const result = await afterSaleQuestionApi.loadData(page);
       this.tableData = result.data.content.content;
       this.total = result.data.content.totalElements
+    },
+    loadPage(page) {
+      this.loadData(page - 1);
     },
     async edit(id) {
       const data = await afterSaleQuestionApi.find(id);

@@ -1,43 +1,52 @@
 
 <template>
   <div class="app-container">
-    <el-form :inline="true" size="mini">
-      <el-form-item>
-        <el-button type="primary" icon="el-icon-circle-plus" @click="addModel">添加问题分类 </el-button>
-      </el-form-item>
-    </el-form>
-    <el-table
-      :data="tableData"
-      border
-    >
+    <el-row>
+      <el-col :span="4">
+        <el-menu style="height:700px" @select="handleMenuSelect">
+          <el-menu-item index="">
+            <span slot="title">全部</span>
+          </el-menu-item>
+          <el-menu-item v-for="department of options" :key="department.id" :index="department.id">
+            {{ department.name }}
+          </el-menu-item>
+        </el-menu>
+      </el-col>
+      <el-col :span="20" style="padding-left:8px">
+        <el-form :inline="true" size="mini">
+          <el-form-item>
+            <el-button type="primary" icon="el-icon-circle-plus" @click="addModel">添加问题分类 </el-button>
+          </el-form-item>
+        </el-form>
+        <el-table
+          :data="tableData"
+          border
+        >
+          <el-table-column
+            prop="title"
+            label="分类名称"
+          />
+          <el-table-column
+            prop="status"
+            label="状态"
+            :formatter="formatterEnableStatus"
+          />
 
-      <el-table-column
-        prop="departmentName"
-        label="所属部门"
-      />
-      <el-table-column
-        prop="title"
-        label="分类名称"
-      />
-      <el-table-column
-        prop="status"
-        label="状态"
-        :formatter="formatterEnableStatus"
-      />
-
-      <el-table-column
-        label="管理"
-        width="360px"
-      >
-        <template v-slot="scop">
-          <el-button size="small" icon="el-icon-top" @click="moveUp(scop.row.id)" />
-          <el-button size="small" icon="el-icon-bottom" @click="moveDown(scop.row.id)" />
-          <el-button size="small" type="primary" @click="edit(scop.row.id)">编辑</el-button>
-          <el-button size="small" @click="toggle(scop.row.id)">状态变更</el-button>
-          <el-button size="small" type="danger" @click="deleteQuestionCategory(scop.row.id)">删除</el-button>
-        </template>
-      </el-table-column>
-    </el-table>
+          <el-table-column
+            label="管理"
+            width="360px"
+          >
+            <template v-slot="scop">
+              <el-button size="small" icon="el-icon-top" @click="moveUp(scop.row.id)" />
+              <el-button size="small" icon="el-icon-bottom" @click="moveDown(scop.row.id)" />
+              <el-button size="small" type="primary" @click="edit(scop.row.id)">编辑</el-button>
+              <el-button size="small" @click="toggle(scop.row.id)">状态变更</el-button>
+              <el-button size="small" type="danger" @click="deleteQuestionCategory(scop.row.id)">删除</el-button>
+            </template>
+          </el-table-column>
+        </el-table>
+      </el-col>
+    </el-row>
 
     <el-drawer
       title="添加"
@@ -95,19 +104,12 @@ export default {
       tableData: null,
       drawer: false,
       questionCategory: {},
+      departmentId: '',
       options: [],
       formData: {
-        id: '',
-        userId: '',
-        departmentId: '',
-        departmentName: '',
-        title: '',
-        status: 'enable',
-        sort: '',
-        created: '',
-        modified: ''
 
       },
+      queryParams: {},
       rules: {
 
         departmentId: [
@@ -132,8 +134,13 @@ export default {
   methods: {
     addModel() {
       this.drawer = true;
-      this.formData = {};
+      this.formData = { status: 'enable', departmentId: this.queryParams.departmentId };
     },
+    async handleMenuSelect(index) {
+      this.queryParams.departmentId = index
+      this.loadData(0);
+    },
+
     showValue() {
       console.log('select value', arguments)
     },
@@ -142,8 +149,8 @@ export default {
       this.options = result.data.list;
     },
 
-    async loadData(page) {
-      const result = await questionCategoryApi.loadData(page);
+    async loadData() {
+      const result = await questionCategoryApi.query(this.queryParams)
       this.tableData = result.data.content.content;
     },
     async edit(id) {
@@ -178,7 +185,7 @@ export default {
       if (result.success) {
         this.drawer = false
         this.$alert('数据保存成功');
-        this.loadData();
+        this.loadData()
       } else {
         this.$alert(result.msg, '数据保存失败');
       }
