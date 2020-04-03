@@ -2,7 +2,7 @@
   <div class="app-container">
     <el-form :inline="true" size="mini">
       <el-form-item>
-        <el-button type="primary" icon="el-icon-circle-plus" @click="showPlatform">绑定新店铺</el-button>
+        <!-- <el-button type="primary" icon="el-icon-circle-plus" @click="showPlatform">绑定新店铺</el-button> -->
         <el-button type="primary" icon="el-icon-circle-plus" @click="addModel">手动添加店铺 </el-button>
       </el-form-item>
     </el-form>
@@ -39,8 +39,10 @@
         label="管理"
       >
         <template v-slot="scope">
-          <el-button size="small" type="info" @click="refreshToken()">刷新授权</el-button>
-          <el-button size="small" type="primary" @click="showDetail(scope.row.id)">详情</el-button>
+          <!-- <el-button size="small" type="info" @click="refreshToken()">刷新授权</el-button> -->
+          <!-- <el-button size="small" type="primary" @click="showDetail(scope.row.id)">详情</el-button> -->
+          <el-button size="small" type="primary" @click="deleteShop(scope.row.id)">删除</el-button>
+
         </template>
       </el-table-column>
       <template v-slot:append>
@@ -200,11 +202,17 @@ export default {
       const result = await shopApi.loadData(page);
       if (result.success) {
         this.tableData = result.data.content.content;
-        this.total = result.data.totalElements
+        this.total = result.data.content.totalElements
       }
     },
     loadPage(page) {
       this.loadData(page - 1);
+    },
+    async deleteShop(id) {
+      const result = await shopApi.delete(id);
+      if (result.success) {
+        this.loadData();
+      }
     },
     async showDetail(id) {
       const shop = await shopApi.find(id);
@@ -233,7 +241,6 @@ export default {
       const result = await shopApi.save(this.formData);
       if (result.success) {
         this.drawer = false
-        this.$alert('数据保存成功');
         this.loadData();
       } else {
         this.$alert(result.msg, '数据保存失败');

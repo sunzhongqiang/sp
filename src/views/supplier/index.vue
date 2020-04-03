@@ -29,7 +29,7 @@
           <el-button size="small" icon="el-icon-bottom" @click="moveDown(scop.row.id)" />
           <el-button size="small" type="primary" @click="edit(scop.row.id)">编辑</el-button>
           <el-button size="small" @click="toggle(scop.row.id)">状态变更</el-button>
-          <el-button size="small" type="danger" @click="deleteQuestionCategory(scop.row.id)">删除</el-button>
+          <el-button size="small" type="danger" @click="deleteSupplier(scop.row.id)">删除</el-button>
         </template>
       </el-table-column>
       <template v-slot:append>
@@ -83,6 +83,7 @@ export default {
       tableData: null,
       drawer: false,
       supplier: {},
+      total: 0,
       formData: {
         name: '',
         status: 'enable'
@@ -120,7 +121,8 @@ export default {
     },
     async edit(id) {
       const data = await supplierApi.find(id);
-      this.supplier = data;
+      this.formData = data;
+      this.drawer = true;
     },
     async deleteSupplier(id) {
       const result = await supplierApi.delete(id);
@@ -148,7 +150,6 @@ export default {
       const result = await supplierApi.save(this.formData);
       if (result.success) {
         this.drawer = false
-        this.$alert('数据保存成功');
         this.loadData();
       } else {
         this.$alert(result.msg, '数据保存失败');

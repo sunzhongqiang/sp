@@ -321,7 +321,6 @@ export default {
         if (valid) {
           const userId = this.$store.state.user.id;
           this.subUser.userId = userId
-          console.log('save sub user data', this.subUser)
           subUserApi.save(this.subUser).then(result => {
             if (result.success) {
               this.subUserDrawer = false;

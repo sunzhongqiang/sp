@@ -74,6 +74,7 @@
       :data="tableData"
       border
     >
+
       <el-table-column
         prop="departmentName"
         label="部门名称"
@@ -95,15 +96,17 @@
         prop="supplierName"
         label="供应商"
       />
-
       <el-table-column
-        prop="buyerNick"
-        label="买家昵称"
+        prop="shopName"
+        label="店铺"
       />
-
       <el-table-column
         prop="tradeNo"
         label="订单编号"
+      />
+      <el-table-column
+        prop="buyerNick"
+        label="买家昵称"
       />
       <el-table-column
         prop="total"
@@ -160,7 +163,7 @@
       :with-header="false"
       size="800px"
     >
-      <el-form ref="form" :model="formData" :rules="rules" class="form" size="normal" label-width="120px">
+      <el-form ref="form" :model="formData" :rules="rules" class="form" size="normal" label-width="120px" style="height:100vh;overflow:scroll">
 
         <el-form-item label="选择店铺" prop="shopId">
           <el-select v-model="formData.shopId" placeholder="请选择店铺">
@@ -175,7 +178,6 @@
         <el-form-item label="订单编号" prop="tradeNo">
           <el-input v-model="formData.tradeNo" placeholder="订单编号" maxlength="32" show-word-limit />
         </el-form-item>
-
         <el-form-item label="买家昵称" prop="buyerNick">
           <el-input v-model="formData.buyerNick" placeholder="买家昵称" maxlength="32" show-word-limit />
         </el-form-item>
@@ -226,7 +228,7 @@
 <script>
 import afterSaleQuestionApi from '@/api/AfterSaleQuestionApi'
 import questionCategoryApi from '@/api/questionCategory'
-import supplierGoodsApi from '@/api/supplierGoods'
+import supplierGoods from '@/api/supplierGoods'
 import shopApi from '@/api/shop'
 import formatterUtils from '@/mixins/fomatter'
 import ExportExcel from '@/lib/ExportExcel'
@@ -237,16 +239,12 @@ export default {
     return {
       tableData: null,
       drawer: false,
+      page: 0,
       total: 0,
-      departmentList: [],
-      departmentOptions: [],
       questionCategoryOptions: [],
-      questionOptions: [],
       goodsOption: [],
-      afterSaleQuestion: {},
       shopOptions: [],
       formData: {
-
       },
       queryParams: {},
       rules: {
@@ -302,7 +300,7 @@ export default {
   },
   methods: {
     async loadGoodsOption() {
-      const result = await supplierGoodsApi.findAllWithCategoryAndSupplier();
+      const result = await supplierGoods.findAllWithCategoryAndSupplier();
       this.goodsOption = result.data.list;
     },
     async loadShopOptions() {
@@ -324,7 +322,8 @@ export default {
       this.total = result.data.content.totalElements
     },
     loadPage(page) {
-      this.loadData(page - 1);
+      this.page = page - 1;
+      this.loadData(this.page);
     },
     async edit(id) {
       const data = await afterSaleQuestionApi.find(id);
@@ -359,7 +358,6 @@ export default {
       const result = await afterSaleQuestionApi.save(this.formData);
       if (result.success) {
         this.drawer = false
-        this.$alert('数据保存成功');
         this.loadData();
       } else {
         this.$alert(result.msg, '数据保存失败');
@@ -392,7 +390,6 @@ export default {
         this.queryParams.createdRange[0] = moment(this.queryParams.createdRange[0]).format('YYYY-MM-DD');
         this.queryParams.createdRange[1] = moment(this.queryParams.createdRange[1]).format('YYYY-MM-DD');
       }
-      console.log('queryParams', this.queryParams)
       const result = await afterSaleQuestionApi.query(this.queryParams);
       this.tableData = result.data.content.content;
     },
@@ -414,7 +411,9 @@ export default {
           '商品分类': item.goodsCategoryName,
           '商品名称': item.goodsName,
           '供应商': item.supplierName,
+          '店铺名称': item.shopName,
           '订单编号': item.tradeNo,
+          '买家昵称': item.buyerNick,
           '订单金额': item.total,
           '退款金额': item.refundMoney,
           '问题': item.description,
@@ -425,6 +424,10 @@ export default {
       }
       this.queryParams.pageSize = 1000;
       new ExportExcel().exportExcel(exportData, moment(this.queryParams.createdRange[0]).format('YYYY-MM-DD') + '.xlsx')
+    },
+    async done(id) {
+      await afterSaleQuestionApi.done();
+      this.query(this.page)
     }
   }
 }

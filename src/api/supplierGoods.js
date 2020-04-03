@@ -29,5 +29,8 @@ export default {
 
   findAllWithCategoryAndSupplier() {
     return get(`/supplierGoods/withCategoryAndSupplier`)
+  },
+  findAllByGoodsId(goodsId) {
+    return get(`/supplierGoods/goodsId/${goodsId}`)
   }
 }

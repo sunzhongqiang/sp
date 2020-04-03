@@ -95,7 +95,7 @@ export default {
   methods: {
 
     addModel() {
-      this.formData = {}
+      this.formData = { 'status': 'enable' }
       this.drawer = true;
     },
 

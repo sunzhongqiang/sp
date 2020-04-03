@@ -70,7 +70,8 @@ export const constantRoutes = [
       name: 'home',
       component: () => import('@/views/dashboard/index'),
       meta: { title: '首页', icon: 'dashboard' }
-    }]
+    }],
+    hidden: true
   },
 
   // {
@@ -134,7 +135,7 @@ export const constantRoutes = [
       },
       {
         path: 'supplierGoods',
-        component: () => import('@/views/supply/goods'),
+        component: () => import('@/views/goods'),
         meta: { title: '采购商品' }
       }
     ]
