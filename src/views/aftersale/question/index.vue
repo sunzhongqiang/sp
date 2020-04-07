@@ -358,6 +358,7 @@ export default {
       const result = await afterSaleQuestionApi.save(this.formData);
       if (result.success) {
         this.drawer = false
+        this.$alert('数据保存成功');
         this.loadData();
       } else {
         this.$alert(result.msg, '数据保存失败');
