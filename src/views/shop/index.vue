@@ -242,6 +242,7 @@ export default {
       if (result.success) {
         this.drawer = false
         this.loadData();
+        this.$alert('数据保存成功');
       } else {
         this.$alert(result.msg, '数据保存失败');
       }
